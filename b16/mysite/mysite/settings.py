@@ -122,3 +122,4 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+ALLOWED_HOSTS = ['localhost', 'https://cs3240-945bd786e559.herokuapp.com/']
