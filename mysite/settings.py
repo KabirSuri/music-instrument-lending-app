@@ -9,7 +9,7 @@ https://docs.djangoproject.com/en/5.1/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.1/ref/settings/
 """
-
+import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -24,12 +24,17 @@ SECRET_KEY = 'django-insecure-+ks8lupg3*r1g6x*z480jn+w)(uxetnbg1&2(5)vz8@1$14zot
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
-
-ALLOWED_HOSTS = ['localhost', 'cs3240-945bd786e559.herokuapp.com']
+IS_HEROKU_APP = "DYNO" in os.environ and "CI" not in os.environ
+if IS_HEROKU_APP:
+    ALLOWED_HOSTS = ["*"]
+    SECURE_SSL_REDIRECT = True
+else:
+    ALLOWED_HOSTS = ['.localhost', '127.0.0.1', "[::1]", "0.0.0.0", "[::]"]
 
 # Application definition
 
 INSTALLED_APPS = [
+    'whitenoise.runserver_nostatic',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -122,11 +127,3 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 STATIC_ROOT = BASE_DIR / "staticfiles"
-
-import django_heroku
-django_heroku.settings(locals())
-
-import dj_database_url
-DATABASES = {
-    'default': dj_database_url.config(conn_max_age=600, ssl_require=True)
-}

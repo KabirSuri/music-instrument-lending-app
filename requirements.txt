@@ -1,5 +1,7 @@
-django-heroku
-gunicorn
-whitenoise
-dj-database-url
-psycopg2-binary
+Django==4.2.18
+asgiref==3.8.1
+gunicorn==23.0.0
+whitenoise==6.8.2
+packaging==24.2
+typing_extensions==4.12.2
+sqlparse==0.5.3
