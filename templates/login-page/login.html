@@ -3,7 +3,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>UVA Library Login</title>
-    <style>
+    <style> /* CSS code */
         * {
             margin: 0;
             padding: 0;
@@ -35,7 +35,7 @@
             margin-bottom: 2rem;
         }
 
-        .login-header h1 {
+        .login-header h1 { 
             color: #232D4B;  /* UVA blue */
             font-size: 1.75rem;
             font-weight: 600;
@@ -48,7 +48,7 @@
             gap: 1rem;
         }
 
-        .login-button {
+        .login-button { /* basic structure for login buttons */
             padding: 1rem;
             color: white;
             border: none;
@@ -65,8 +65,8 @@
             border: 2px solid #232D4B;
         }
 
-        .patron-button:hover {
-            background-color: #141B2F;  /* slightly darker blue */
+        .patron-button:hover { /* on hover, get slightly darker */
+            background-color: #141B2F; 
         }
 
         .librarian-button {
@@ -74,8 +74,8 @@
             border: 2px solid #E57200;
         }
 
-        .librarian-button:hover {
-            background-color: #C66100;  /* slightly darker orange */
+        .librarian-button:hover { /* on hover, get slightly darker */
+            background-color: #C66100; 
         }
 
         .uva-brand {
@@ -86,7 +86,7 @@
             font-weight: 500;
         }
     </style>
-</head>
+</head> 
 <body>
     <div class="login-container">
         <div class="uva-brand">
@@ -95,12 +95,11 @@
         <div class="login-header">
             <h1>CLA Login</h1>
         </div>
-
         <div class="button-group">
-            <button class="login-button patron-button" onclick="window.location.href='/patron-login'">
+            <button class="login-button patron-button" onclick="window.location.href='/patron-login'"> <!---need to attach this to the user google login-->
                 Login as Patron
             </button>
-            <button class="login-button librarian-button" onclick="window.location.href='/librarian-login'">
+            <button class="login-button librarian-button" onclick="window.location.href='/librarian-login'"> <!---need to attach this to the librarian google login-->
                 Login as Librarian
             </button>
         </div>
