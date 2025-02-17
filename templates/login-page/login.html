@@ -2,7 +2,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Library Login</title>
+    <title>UVA Library Login</title>
     <style>
         * {
             margin: 0;
@@ -16,17 +16,18 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            background-color: #f5f5f5;
+            background-color: #232D4B;  /* UVA blue */
         }
 
         .login-container {
             background-color: white;
-            padding: 2rem;
+            padding: 3rem;
             border-radius: 10px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
             width: 100%;
             max-width: 400px;
             margin: 1rem;
+            border: 2px solid #E57200;  /* UVA orange */
         }
 
         .login-header {
@@ -35,157 +36,73 @@
         }
 
         .login-header h1 {
-            color: #333;
+            color: #232D4B;  /* UVA blue */
             font-size: 1.75rem;
             font-weight: 600;
             margin-bottom: 0.5rem;
         }
 
-        .login-header p {
-            color: #666;
-            font-size: 0.9rem;
-        }
-
-        .form-group {
-            margin-bottom: 1.5rem;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 0.5rem;
-            color: #333;
-            font-weight: 500;
-        }
-
-        .form-group input {
-            width: 100%;
-            padding: 0.75rem;
-            border: 1.5px solid #ddd;
-            border-radius: 6px;
-            font-size: 1rem;
-            transition: border-color 0.2s;
-        }
-
-        .form-group input:focus {
-            outline: none;
-            border-color: #4A90E2;
-        }
-
         .button-group {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
+            display: flex;
+            flex-direction: column;
             gap: 1rem;
-            margin-bottom: 1rem;
         }
 
         .login-button {
-            padding: 0.75rem;
+            padding: 1rem;
             color: white;
             border: none;
             border-radius: 6px;
-            font-size: 0.9rem;
+            font-size: 1.1rem;
             font-weight: 500;
             cursor: pointer;
-            transition: background-color 0.2s;
+            transition: all 0.2s ease;
+            width: 100%;
         }
 
         .patron-button {
-            background-color: #4A90E2;
+            background-color: #232D4B;  /* UVA blue */
+            border: 2px solid #232D4B;
         }
 
         .patron-button:hover {
-            background-color: #357ABD;
+            background-color: #141B2F;  /* slightly darker blue */
         }
 
         .librarian-button {
-            background-color: #2C3E50;
+            background-color: #E57200;  /* UVA orange */
+            border: 2px solid #E57200;
         }
 
         .librarian-button:hover {
-            background-color: #1A2632;
+            background-color: #C66100;  /* slightly darker orange */
         }
 
-        .extra-options {
-            margin-top: 1rem;
+        .uva-brand {
             text-align: center;
-            font-size: 0.9rem;
-        }
-
-        .extra-options a {
-            color: #4A90E2;
-            text-decoration: none;
-        }
-
-        .extra-options a:hover {
-            text-decoration: underline;
-        }
-
-        .error-message {
-            background-color: #FEE;
-            color: #C00;
-            padding: 0.75rem;
-            border-radius: 6px;
             margin-bottom: 1rem;
-            font-size: 0.9rem;
-        }
-
-        input[name="role"] {
-            display: none;
+            color: #232D4B;
+            font-size: 1.2rem;
+            font-weight: 500;
         }
     </style>
 </head>
 <body>
     <div class="login-container">
+        <div class="uva-brand">
+            University of Virginia
+        </div>
         <div class="login-header">
-            <h1>Library Login</h1>
-            <p>Please enter your credentials to login</p>
+            <h1>CLA Login</h1>
         </div>
 
-        {% if messages %}
-            {% for message in messages %}
-                <div class="error-message">{{ message }}</div>
-            {% endfor %}
-        {% endif %}
-
-        <form method="POST">
-            {% csrf_token %}
-            <div class="form-group">
-                <label for="username">Username</label>
-                <input 
-                    type="text" 
-                    id="username" 
-                    name="username" 
-                    placeholder="Enter your username"
-                    required
-                >
-            </div>
-            <div class="form-group">
-                <label for="password">Password</label>
-                <input 
-                    type="password" 
-                    id="password" 
-                    name="password" 
-                    placeholder="Enter your password"
-                    required
-                >
-            </div>
-            <input type="hidden" name="role" id="role">
-            <div class="button-group">
-                <button type="submit" 
-                        class="login-button patron-button"
-                        onclick="document.getElementById('role').value='patron'">
-                    Login as Patron
-                </button>
-                <button type="submit" 
-                        class="login-button librarian-button"
-                        onclick="document.getElementById('role').value='librarian'">
-                    Login as Librarian
-                </button>
-            </div>
-        </form>
-
-        <div class="extra-options">
-            <a href="#">Forgot your password?</a>
+        <div class="button-group">
+            <button class="login-button patron-button" onclick="window.location.href='/patron-login'">
+                Login as Patron
+            </button>
+            <button class="login-button librarian-button" onclick="window.location.href='/librarian-login'">
+                Login as Librarian
+            </button>
         </div>
     </div>
 </body>
