@@ -5,6 +5,5 @@ def login_view(request):
         role = request.POST.get('role')
         username = request.POST.get('username')
         password = request.POST.get('password')
-        print(f"Login attempt - Role: {role}, Username: {username}")  # For testing
         
     return render(request, 'login-page/login.html')
