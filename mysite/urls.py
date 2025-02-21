@@ -22,5 +22,7 @@ from . import views
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('login/', views.login_view, name='login'),
+    path('patron-login/', views.patron_login, name='patron-login'),
+    path('librarian-login/', views.librarian_login, name='librarian-login'),
     path('', RedirectView.as_view(url='login/'), name='root'),  # Redirects root URL to login
 ]
