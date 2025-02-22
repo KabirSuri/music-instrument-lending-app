@@ -7,3 +7,9 @@ def login_view(request):
         password = request.POST.get('password')
         
     return render(request, 'login-page/login.html')
+
+def patron_login(request):
+    return render(request, 'login-page/patron-landing.html')
+
+def librarian_login(request):
+    return render(request, 'login-page/librarian-landing.html')
