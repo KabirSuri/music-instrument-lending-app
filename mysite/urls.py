@@ -25,4 +25,6 @@ urlpatterns = [
     #path('', RedirectView.as_view(url='login/'), name='root'),  # Redirects root URL to login
     path('accounts/', include("allauth.urls")),
     path('', include("users.urls")),
+    path('patron-landing/', views.patron_login, name='patron-landing'),
+    path('librarian-landing/', views.librarian_login, name='librarian-landing'),
 ]

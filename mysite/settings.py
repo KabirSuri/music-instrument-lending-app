@@ -33,7 +33,7 @@ else:
 
 # Application definition
 
-SITE_ID = 1
+SITE_ID = 2
 
 INSTALLED_APPS = [
     'whitenoise.runserver_nostatic',
