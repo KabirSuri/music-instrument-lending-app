@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -48,33 +49,34 @@
             gap: 1rem;
         }
 
-        .login-button { /* basic structure for login buttons */
+        .login-link { /* basic structure for login links */
+            display: block;
             padding: 1rem;
             color: white;
-            border: none;
+            text-align: center;
+            text-decoration: none;
             border-radius: 6px;
             font-size: 1.1rem;
             font-weight: 500;
-            cursor: pointer;
             transition: all 0.2s ease;
             width: 100%;
         }
 
-        .patron-button {
+        .patron-link {
             background-color: #232D4B;  /* UVA blue */
             border: 2px solid #232D4B;
         }
 
-        .patron-button:hover { /* on hover, get slightly darker */
+        .patron-link:hover { /* on hover, get slightly darker */
             background-color: #141B2F; 
         }
 
-        .librarian-button {
+        .librarian-link {
             background-color: #E57200;  /* UVA orange */
             border: 2px solid #E57200;
         }
 
-        .librarian-button:hover { /* on hover, get slightly darker */
+        .librarian-link:hover { /* on hover, get slightly darker */
             background-color: #C66100; 
         }
 
@@ -96,12 +98,9 @@
             <h1>CLA Login</h1>
         </div>
         <div class="button-group">
-            <button class="login-button patron-button" onclick="window.location.href='/patron-login'"> <!---need to attach this to the user google login-->
-                Login as Patron
-            </button>
-            <button class="login-button librarian-button" onclick="window.location.href='/librarian-login'"> <!---need to attach this to the librarian google login-->
-                Login as Librarian
-            </button>
+            {% load socialaccount %}
+            <a class="login-link patron-link" href="{% provider_login_url 'google' %}?next=/patron-landing">Login as Patron</a>
+            <a class="login-link librarian-link" href="{% provider_login_url 'google' %}?next=/librarian-landing">Login as Librarian</a>
         </div>
     </div>
 </body>
