@@ -22,7 +22,6 @@ from . import views
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('login/', views.login_view, name='login'),
-    #path('', RedirectView.as_view(url='login/'), name='root'),  # Redirects root URL to login
     path('accounts/', include("allauth.urls")),
     path('', views.login_view, name='login'),
     path('patron-landing/', views.patron_login, name='patron-landing'),
