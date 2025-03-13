@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     "allauth.account",
     "allauth.socialaccount",
     "allauth.socialaccount.providers.google",
+    "mysite",
 ]
 
 SOCIALACCOUNT_PROVIDERS = {
@@ -102,9 +103,9 @@ WSGI_APPLICATION = 'mysite.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'mydatabase',
-        'USER': 'myuser',
-        'PASSWORD': 'mypassword',
+        'NAME': 'testdb',
+        'USER': 'testuser',
+        'PASSWORD': 'testpass',
         'HOST': 'localhost',
         'PORT': '5432',
     }

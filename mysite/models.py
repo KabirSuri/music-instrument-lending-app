@@ -10,6 +10,7 @@ class UserProfile(models.Model):
     profile_picture = models.URLField(blank=True, null=True)
     bio = models.TextField(blank=True, null=True)
     date_joined = models.DateTimeField(auto_now_add=True)
+    is_librarian = models.BooleanField(default=False)
     
     def __str__(self):
         return self.user.email
@@ -38,3 +39,63 @@ def populate_profile(request, user, **kwargs):
         
         # Save the updated profile
         user.profile.save()
+
+# Maybe unneeded, unclear if we will ever have >1 library https://s25.cs3240.org/project.html#libraries
+class Library(models.Model):
+    name = models.CharField(max_length=255)
+    description = models.TextField(blank=True, null=True)
+    
+    def __str__(self):
+        return self.name
+
+# https://s25.cs3240.org/project.html#items
+class Item(models.Model):
+    # Defaults from project info examples; replaceable if unneeded
+    STATUS_CHOICES = [
+        ('checked_in', 'Checked In'),
+        ('in_circulation', 'In Circulation'),
+        ('being_repaired', 'Being Repaired'),
+    ]
+    
+    title = models.CharField(max_length=255)
+    primary_identifier = models.CharField(max_length=255, unique=True)
+    status = models.CharField(max_length=50, choices=STATUS_CHOICES)
+    library = models.ForeignKey(Library, on_delete=models.CASCADE, related_name='items')
+    description = models.TextField(blank=True, null=True)
+    # Items belong to 0-inf collections inclusive
+    collections = models.ManyToManyField('Collection', related_name='items', blank=True)
+    
+    def __str__(self):
+        return self.title
+
+# Item images, fetched from S3
+class ItemImage(models.Model):
+    item = models.ForeignKey(Item, on_delete=models.CASCADE, related_name='images')
+    image_url = models.URLField()  # Stores S3 URL
+    time = models.DateTimeField(auto_now_add=True)
+    
+    def __str__(self):
+        return f"Image for {self.item.title}"
+
+# Item ratings/comments
+class ItemReview(models.Model):
+    item = models.ForeignKey(Item, on_delete=models.CASCADE, related_name='reviews')
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    rating = models.PositiveSmallIntegerField()
+    comment = models.TextField(blank=True, null=True)
+    time = models.DateTimeField(auto_now_add=True)
+    
+    def __str__(self):
+        return f"Review for {self.item.title} by {self.user.email}"
+
+# https://s25.cs3240.org/project.html#collections
+class Collection(models.Model):
+    title = models.CharField(max_length=255)
+    description = models.TextField(blank=True, null=True)
+    is_public = models.BooleanField(default=True)
+    library = models.ForeignKey(Library, on_delete=models.CASCADE, related_name='collections')
+    # Users who can access a PRIVATE collection (librarians bypass this automatically)
+    allowed_users = models.ManyToManyField(User, blank=True)
+    
+    def __str__(self):
+        return self.title
