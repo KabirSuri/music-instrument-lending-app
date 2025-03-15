@@ -34,7 +34,7 @@ else:
 
 # Application definition
 
-SITE_ID = 4
+SITE_ID = 9
 
 INSTALLED_APPS = [
     'mysite',
