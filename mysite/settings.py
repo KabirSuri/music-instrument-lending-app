@@ -37,6 +37,7 @@ else:
 SITE_ID = 4
 
 INSTALLED_APPS = [
+    'mysite',
     'whitenoise.runserver_nostatic',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -49,7 +50,6 @@ INSTALLED_APPS = [
     "allauth.account",
     "allauth.socialaccount",
     "allauth.socialaccount.providers.google",
-    "mysite",
 ]
 
 SOCIALACCOUNT_PROVIDERS = {
@@ -104,8 +104,8 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'testdb',
-        'USER': 'testuser',
-        'PASSWORD': 'testpass',
+        'USER': 'postgres',
+        'PASSWORD': '',
         'HOST': 'localhost',
         'PORT': '5432',
     }
