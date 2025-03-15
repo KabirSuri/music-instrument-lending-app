@@ -7,7 +7,7 @@ from allauth.socialaccount.models import SocialAccount
 
 class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
-    profile_picture = models.URLField(blank=True, null=True)
+    profile_pic = models.ImageField(upload_to='profile_pics/', null=True, blank=True)
     bio = models.TextField(blank=True, null=True)
     date_joined = models.DateTimeField(auto_now_add=True)
     is_librarian = models.BooleanField(default=False)
