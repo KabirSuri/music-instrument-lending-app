@@ -36,9 +36,18 @@ def populate_profile(request, user, **kwargs):
         # Update profile with Google information
         if 'picture' in user_data:
             user.profile.profile_picture = user_data['picture']
-        
-        # Save the updated profile
-        user.profile.save()
+    
+    # set librarian variable on librarian logins
+    # role setting didnt work
+    # intermediary view didnt work
+    next_url = request.GET.get('next', '')
+    if next_url.startswith('/librarian-landing'):
+        user.profile.is_librarian = True
+    else:
+        user.profile.is_librarian = False
+
+    # Save the updated profile
+    user.profile.save()
 
 # Maybe unneeded, unclear if we will ever have >1 library https://s25.cs3240.org/project.html#libraries
 class Library(models.Model):

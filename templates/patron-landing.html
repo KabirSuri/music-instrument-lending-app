@@ -55,11 +55,11 @@
   </nav>
   <main>
     <section id="search" class="section">
-      <h2>Item Search</h2>
-      <form method="get" action="{% url 'search' %}">
-        <input type="text" name="query" placeholder="Search for items...">
+      <h2>Instrument Search</h2>
+      <div class="search-box">
+        <input type="text" placeholder="Search..." name="query">
         <button type="submit">Search</button>
-      </form>
+      </div>
     </section>
     <section id="browse" class="section">
       <h2>Browse Items</h2>

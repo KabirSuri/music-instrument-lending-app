@@ -23,10 +23,21 @@
     {% endif %}
     <p>Email: {{ request.user.email }}</p>
     <p>Bio: {{ profile.bio|default:"No bio provided." }}</p>
+    {% if profile.is_librarian %}
+      <p>is_librarian: true<p>
+    {% else %}
+      <p>is_librarian: false<p>
+    {% endif %}
+
     
     <div class="actions">
       <a href="{% url 'image_upload' %}">Update Profile Picture</a>
     </div>
+
+    <div class="backlink">
+      <p><a href="{% url 'patron-landing' %}">Back to Landing</p>
+    </div>
+
   </div>
 </body>
 </html>
