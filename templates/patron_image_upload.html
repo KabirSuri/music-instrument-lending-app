@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Update Profile Picture</title>
+  <style>
+    body { font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 2rem; }
+    form { background: #fff; padding: 1rem; border-radius: 8px; max-width: 600px; margin: 0 auto; }
+    label { display: block; margin-top: 1rem; }
+    input[type="file"] { width: 100%; padding: 0.5rem; margin-top: 0.5rem; }
+    button { margin-top: 1rem; padding: 0.5rem 1rem; background-color: #232D4B; color: #fff; border: none; border-radius: 4px; cursor: pointer; }
+  </style>
+</head>
+<body>
+  <h1>Update Your Profile Picture</h1>
+  <form method="POST" action="{% url 'image_upload' %}" enctype="multipart/form-data">
+    {% csrf_token %}
+    <label for="profile_image">Select a new profile picture:</label>
+    <input type="file" id="profile_image" name="profile_image_file">
+    <button type="submit">Upload</button>
+  </form>
+</body>
+</html>
+

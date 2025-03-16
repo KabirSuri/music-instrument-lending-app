@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 import os
+from decouple import config
 import dj_database_url
 from pathlib import Path
 
@@ -50,6 +51,7 @@ INSTALLED_APPS = [
     "allauth.account",
     "allauth.socialaccount",
     "allauth.socialaccount.providers.google",
+    'storages',
 ]
 
 SOCIALACCOUNT_PROVIDERS = {
@@ -135,6 +137,27 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+# AWS configuration
+AWS_ACCESS_KEY_ID = config('AWS_ACCESS_KEY')
+AWS_SECRET_ACCESS_KEY = config('AWS_SECRET_KEY')
+
+# Basic Storage configuration for amazon A3
+AWS_STORAGE_BUCKET_NAME = 'uva-elevate-bkt-cs3240'
+AWS_S3_CUSTOM_DOMAIN = '%s.s3.amazonaws.com' % AWS_STORAGE_BUCKET_NAME
+AWS_S3_FILE_OVERWRITE = False
+
+# Django >4.2
+STORAGES = {
+    # Media file image management
+    "default": {
+        "BACKEND": "storages.backends.s3boto3.S3Boto3Storage",
+    },
+
+    # CSS and JS file management
+    "staticfiles": {
+        "BACKEND": "storages.backends.s3boto3.S3StaticStorage",
+    },
+}
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.1/topics/i18n/

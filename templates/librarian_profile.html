@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Librarian Profile</title>
+  <style>
+    body { font-family: Arial, sans-serif; background-color: #fff; padding: 2rem; }
+    .profile { max-width: 600px; margin: 0 auto; }
+    .profile img { max-width: 150px; border-radius: 50%; }
+    .profile h1 { color: #232D4B; }
+    .profile p { margin: 0.5rem 0; }
+    .actions { margin-top: 1rem; }
+    .actions a { text-decoration: none; color: #E57200; font-weight: bold; }
+  </style>
+</head>
+<body>
+  <div class="profile">
+    <h1>{{ request.user.username }}'s Profile</h1>
+    {% if profile.profile_picture %}
+      <img src="{{ profile.profile_picture.url }}" alt="Profile Picture">
+    {% else %}
+      <p>No profile picture uploaded.</p>
+    {% endif %}
+    <p>Email: {{ request.user.email }}</p>
+    <p>Bio: {{ profile.bio|default:"No bio provided." }}</p>
+    
+    <div class="actions">
+      <a href="{% url 'image_upload' %}">Upload/Update Profile Picture &amp; Item Image</a>
+    </div>
+    
+    <div class="items">
+      <h2>Your Items</h2>
+      <ul>
+        {% for item in items %}
+          <li><a href="{% url 'item_detail' item.id %}">{{ item.title }}</a></li>
+        {% empty %}
+          <li>No items added yet.</li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+</body>
+</html>
+

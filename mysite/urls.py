@@ -28,6 +28,8 @@ urlpatterns = [
     path('', views.login_view, name='login'),
     path('patron-landing/', views.patron_login, name='patron-landing'),
     path('librarian-landing/', views.librarian_login, name='librarian-landing'),
+    path('profile/', views.profile_view, name='profile'),
+    path('image_upload/', views.image_upload_view, name='image_upload'),
 ]
 
 if settings.DEBUG:

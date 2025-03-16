@@ -7,7 +7,7 @@ from allauth.socialaccount.models import SocialAccount
 
 class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
-    profile_pic = models.ImageField(upload_to='profile_pics/', null=True, blank=True)
+    profile_picture = models.ImageField(upload_to='profile_images/', null=True, blank=True)
     bio = models.TextField(blank=True, null=True)
     date_joined = models.DateTimeField(auto_now_add=True)
     is_librarian = models.BooleanField(default=False)
@@ -71,7 +71,7 @@ class Item(models.Model):
 # Item images, fetched from S3
 class ItemImage(models.Model):
     item = models.ForeignKey(Item, on_delete=models.CASCADE, related_name='images')
-    image_url = models.URLField()  # Stores S3 URL
+    image = models.ImageField(upload_to='item_images/', null=True, blank=True)
     time = models.DateTimeField(auto_now_add=True)
     
     def __str__(self):

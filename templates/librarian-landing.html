@@ -6,7 +6,6 @@
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { font-family: Arial, sans-serif; background-color: #f4f4f4; color: #333; }
-    
     header {
       background-color: #232D4B;
       color: #fff;
@@ -73,46 +72,52 @@
 </head>
 <body>
   <header>
-    <h1>Welcome, (username here - librarian)</h1>
+    <h1>Welcome, {{ request.user.username }} (librarian)</h1>
   </header>
   <nav>
     <a href="#search">Search</a>
     <a href="#browse">Browse</a>
-    <a href="#profile">Profile</a>
+    <a href="{% url 'profile' %}">Profile</a>
     <a href="#approve">Requests</a>
   </nav>
   <main>
     <section id="search" class="section">
       <h2>Instrument Search</h2>
       <div class="search-box">
-        <input type="text" placeholder="Search...">
-        <button>Search</button>
+        <input type="text" placeholder="Search..." name="query">
+        <button type="submit">Search</button>
       </div>
     </section>
     <section id="browse" class="section">
-      <h2>Browse</h2>
+      <h2>Browse Items</h2>
       <ul>
-        <li>Item 1</li>
-        <li>Item 2</li>
-        <li>Item 3</li>
-        <li>Item 4</li>
+        {% if items %}
+          {% for item in items %}
+            <li><a href="{% url 'item_detail' item.id %}">{{ item.title }}</a></li>
+          {% endfor %}
+        {% else %}
+          <li>No items available.</li>
+        {% endif %}
       </ul>
     </section>
     <section id="profile" class="section">
-      <h2>Profile</h2>
-      <p>Profile stuff (maybe move to seperate page)</p>
+      <h2>Your Profile</h2>
+      <p><a href="{% url 'profile' %}">View Profile</a></p>
     </section>
     <section id="approve" class="section">
       <h2>Pending Rental Requests</h2>
       <ul>
-        <li>Request 1</li>
-        <li>Request 2</li>
-        <li>Request 3</li>
+        {% if requests %}
+          {% for req in requests %}
+            <li>{{ req }}</li>
+          {% endfor %}
+        {% else %}
+          <li>No pending requests.</li>
+        {% endif %}
       </ul>
     </section>
   </main>
   <footer>
-  <!--Mandatory Disclaimer-->
     <p>This system is a class project, the system is not monitored, and no real information should be submitted.</p>
   </footer>
 </body>
