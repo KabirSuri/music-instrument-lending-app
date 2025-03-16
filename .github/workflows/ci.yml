@@ -37,7 +37,6 @@ jobs:
 
       - name: Set up Django environment
         run: |
-          cp .env .env  
           python manage.py collectstatic --noinput
           python manage.py migrate
 
