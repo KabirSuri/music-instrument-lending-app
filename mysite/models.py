@@ -3,6 +3,8 @@ from django.contrib.auth.models import User
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from allauth.account.signals import user_signed_up
+from django.utils import timezone
+from datetime import timedelta
 from allauth.socialaccount.models import SocialAccount
 
 class UserProfile(models.Model):
@@ -96,6 +98,25 @@ class ItemReview(models.Model):
     
     def __str__(self):
         return f"Review for {self.item.title} by {self.user.email}"
+    
+class BorrowRequest(models.Model):
+    item = models.ForeignKey(Item, on_delete=models.CASCADE, related_name='borrow_requests')
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    requested_at = models.DateTimeField(auto_now_add=True)
+    approved = models.BooleanField(default=False)
+    due_date = models.DateField(null=True, blank=True)
+
+    def approve(self):
+        """Approve request and update item status"""
+        self.approved = True
+        self.due_date = timezone.now().date() + timedelta(days=14)  # 2-week borrow period
+        self.item.status = 'in_circulation'
+        self.item.save()
+        self.save()
+
+    def __str__(self):
+        return f"{self.user.username} requested {self.item.title}"
+
 
 # https://s25.cs3240.org/project.html#collections
 class Collection(models.Model):

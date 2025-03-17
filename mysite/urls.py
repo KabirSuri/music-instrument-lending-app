@@ -30,6 +30,9 @@ urlpatterns = [
     path('librarian-landing/', views.librarian_login, name='librarian-landing'),
     path('profile/', views.profile_view, name='profile'),
     path('image_upload/', views.image_upload_view, name='image_upload'),
+    path('borrow/<int:item_id>/', views.borrow_item, name="borrow_item"),
+    path('items/', views.search_items, name="search_items"),
+    path('items/<int:item_id>/', views.item_detail, name="item_detail"),
 ]
 
 if settings.DEBUG:

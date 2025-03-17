@@ -1,8 +1,8 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
+from .models import Item, BorrowRequest, ItemImage
 from django.urls import reverse
 from allauth.socialaccount.providers.google.views import oauth2_login
-from .models import Item, ItemImage
 
 def login_view(request):
     if request.method == 'POST':
@@ -54,3 +54,32 @@ def image_upload_view(request):
     else:
         return render(request, 'patron_image_upload.html', context)
 
+@login_required
+def borrow_item(request, item_id):
+    item = get_object_or_404(Item, id=item_id)
+
+    # Prevent duplicate requests
+    existing_request = BorrowRequest.objects.filter(item=item, user=request.user, approved=False).exists()
+    if existing_request:
+        return redirect('item_detail', item_id=item.id)
+
+    # Create a borrow request
+    BorrowRequest.objects.create(item=item, user=request.user)
+
+    return redirect('item_detail', item_id=item.id)  # Redirect back to item page
+
+def search_items(request):
+    """Display and search for items."""
+    query = request.GET.get('q', '')
+    
+    if query:
+        items = Item.objects.filter(title__icontains=query)
+    else:
+        items = Item.objects.all()
+
+    return render(request, "item_list.html", {"items": items, "query": query})
+
+
+def item_detail(request, item_id):
+    item = get_object_or_404(Item, id=item_id)
+    return render(request, "item_detail.html", {"item": item})

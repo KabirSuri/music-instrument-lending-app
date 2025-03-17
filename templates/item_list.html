@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mx-auto max-w-2xl p-6">
+    <h2 class="text-2xl font-bold">Browse Items</h2>
+
+    <!-- Search Form -->
+    <form method="GET" action="{% url 'search_items' %}" class="mt-4">
+        <input type="text" name="q" placeholder="Search for an item..."
+               class="border p-2 rounded w-full">
+        <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded mt-2">
+            Search
+        </button>
+    </form>
+
+    <!-- Item List -->
+    <ul class="mt-6">
+        {% if items %}
+            {% for item in items %}
+                <li class="p-4 border-b">
+                    <a href="{% url 'item_detail' item.id %}" class="text-blue-600 font-semibold">
+                        {{ item.title }}
+                    </a> - {{ item.library.name }}
+                </li>
+            {% endfor %}
+        {% else %}
+            <li>No items found.</li>
+        {% endif %}
+    </ul>
+</div>
+{% endblock %}
