@@ -35,7 +35,7 @@ else:
 
 # Application definition
 
-SITE_ID = 10
+SITE_ID = config('SITE_ID', cast=int)
 
 INSTALLED_APPS = [
     'mysite',
