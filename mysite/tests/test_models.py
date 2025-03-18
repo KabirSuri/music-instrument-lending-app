@@ -1,10 +1,10 @@
 from django.test import TestCase
 from django.contrib.auth.models import User
+from django.core.files.uploadedfile import SimpleUploadedFile
 from ..models import UserProfile, Library, Item, Collection, ItemImage, ItemReview
 
 class ItemModelTest(TestCase):
     def setUp(self):
-        # Create a Library to represent the full catalog.
         self.library = Library.objects.create(name="Test Library", description="A library for testing")
         self.item = Item.objects.create(
             title="Test Book",
@@ -16,10 +16,14 @@ class ItemModelTest(TestCase):
     
     def test_item_str(self):
         self.assertEqual(str(self.item), "Test Book")
-    
+
     def test_add_image(self):
-        image = ItemImage.objects.create(item=self.item, image_url="http://s3.amazonaws.com/bucket/image.jpg")
+        dummy_image = SimpleUploadedFile(
+            "test_image.jpg", b"dummy image content", content_type="image/jpeg"
+        )
+        image = ItemImage.objects.create(item=self.item, image=dummy_image)
         self.assertEqual(self.item.images.count(), 1)
+
     
     def test_add_review(self):
         user = User.objects.create(username="testuser", email="test@example.com")
@@ -28,10 +32,8 @@ class ItemModelTest(TestCase):
 
 class CollectionModelTest(TestCase):
     def setUp(self):
-        # Create a Library for collections.
         self.library = Library.objects.create(name="Test Library", description="A library for testing")
         self.user = User.objects.create(username="patron", email="patron@example.com")
-        # Associate the collection with the library.
         self.collection = Collection.objects.create(
             title="New Arrivals", 
             description="Latest books",
@@ -44,6 +46,5 @@ class CollectionModelTest(TestCase):
         self.assertEqual(self.collection.allowed_users.count(), 1)
     
     def test_collection_library_relationship(self):
-        # Ensure the collection is linked to the correct library.
         self.assertEqual(self.collection.library, self.library)
 

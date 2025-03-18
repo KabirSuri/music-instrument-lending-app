@@ -2,4 +2,6 @@ project-venv/
 __pycache__/
 *.pyc
 *.pyo
+.env
+env
 client_secret_658739789846-ofs90l87kk4ah5cda75jdcr1h1m7c4mm.apps.googleusercontent.com.json

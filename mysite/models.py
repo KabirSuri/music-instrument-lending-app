@@ -3,11 +3,13 @@ from django.contrib.auth.models import User
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from allauth.account.signals import user_signed_up
+from django.utils import timezone
+from datetime import timedelta
 from allauth.socialaccount.models import SocialAccount
 
 class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
-    profile_picture = models.URLField(blank=True, null=True)
+    profile_picture = models.ImageField(upload_to='profile_images/', null=True, blank=True)
     bio = models.TextField(blank=True, null=True)
     date_joined = models.DateTimeField(auto_now_add=True)
     is_librarian = models.BooleanField(default=False)
@@ -36,9 +38,18 @@ def populate_profile(request, user, **kwargs):
         # Update profile with Google information
         if 'picture' in user_data:
             user.profile.profile_picture = user_data['picture']
-        
-        # Save the updated profile
-        user.profile.save()
+    
+    # set librarian variable on librarian logins
+    # role setting didnt work
+    # intermediary view didnt work
+    next_url = request.GET.get('next', '')
+    if next_url.startswith('/librarian-landing'):
+        user.profile.is_librarian = True
+    else:
+        user.profile.is_librarian = False
+
+    # Save the updated profile
+    user.profile.save()
 
 # Maybe unneeded, unclear if we will ever have >1 library https://s25.cs3240.org/project.html#libraries
 class Library(models.Model):
@@ -71,7 +82,7 @@ class Item(models.Model):
 # Item images, fetched from S3
 class ItemImage(models.Model):
     item = models.ForeignKey(Item, on_delete=models.CASCADE, related_name='images')
-    image_url = models.URLField()  # Stores S3 URL
+    image = models.ImageField(upload_to='item_images/', null=True, blank=True)
     time = models.DateTimeField(auto_now_add=True)
     
     def __str__(self):
@@ -87,6 +98,25 @@ class ItemReview(models.Model):
     
     def __str__(self):
         return f"Review for {self.item.title} by {self.user.email}"
+    
+class BorrowRequest(models.Model):
+    item = models.ForeignKey(Item, on_delete=models.CASCADE, related_name='borrow_requests')
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    requested_at = models.DateTimeField(auto_now_add=True)
+    approved = models.BooleanField(default=False)
+    due_date = models.DateField(null=True, blank=True)
+
+    def approve(self):
+        """Approve request and update item status"""
+        self.approved = True
+        self.due_date = timezone.now().date() + timedelta(days=14)  # 2-week borrow period
+        self.item.status = 'in_circulation'
+        self.item.save()
+        self.save()
+
+    def __str__(self):
+        return f"{self.user.username} requested {self.item.title}"
+
 
 # https://s25.cs3240.org/project.html#collections
 class Collection(models.Model):
