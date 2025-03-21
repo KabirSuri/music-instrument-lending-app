@@ -4,30 +4,131 @@
   <meta charset="UTF-8">
   <title>Librarian Profile</title>
   <style>
-    body { font-family: Arial, sans-serif; background-color: #fff; padding: 2rem; }
-    .profile { max-width: 600px; margin: 0 auto; }
-    .profile img { max-width: 150px; border-radius: 50%; }
-    .profile h1 { color: #232D4B; }
-    .profile p { margin: 0.5rem 0; }
-    .actions { margin-top: 1rem; }
-    .actions a { text-decoration: none; color: #E57200; font-weight: bold; }
+    body { 
+      font-family: Arial, sans-serif; 
+      background-color: #f5f5f5; 
+      margin: 0;
+      padding: 2rem;
+    }
+    .profile { 
+      max-width: 800px; 
+      margin: 0 auto;
+      background-color: white;
+      padding: 2rem;
+      border-radius: 10px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .profile-header {
+      display: flex;
+      align-items: center;
+      gap: 2rem;
+      margin-bottom: 2rem;
+      padding-bottom: 1rem;
+      border-bottom: 2px solid #f0f0f0;
+    }
+    .profile img { 
+      width: 150px; 
+      height: 150px;
+      border-radius: 50%; 
+      object-fit: cover;
+      border: 3px solid #E57200;
+    }
+    .profile-info {
+      flex: 1;
+    }
+    .profile h1 { 
+      color: #232D4B; 
+      margin: 0 0 0.5rem 0;
+      font-size: 2rem;
+    }
+    .profile p { 
+      margin: 0.5rem 0;
+      color: #666;
+    }
+    .profile .role-badge {
+      display: inline-block;
+      background-color: #E57200;
+      color: white;
+      padding: 0.25rem 0.75rem;
+      border-radius: 15px;
+      font-size: 0.9rem;
+      margin-top: 0.5rem;
+    }
+    .actions { 
+      margin: 1.5rem 0;
+      display: flex;
+      gap: 1rem;
+    }
+    .actions a { 
+      text-decoration: none; 
+      color: white;
+      background-color: #E57200;
+      padding: 0.75rem 1.5rem;
+      border-radius: 5px;
+      font-weight: bold;
+      transition: background-color 0.3s;
+    }
+    .actions a:hover {
+      background-color: #d66a00;
+    }
+    .items {
+      margin-top: 2rem;
+      padding-top: 1rem;
+      border-top: 2px solid #f0f0f0;
+    }
+    .items h2 {
+      color: #232D4B;
+      margin-bottom: 1rem;
+    }
+    .items ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    .items li {
+      padding: 0.75rem;
+      background-color: #f8f8f8;
+      margin-bottom: 0.5rem;
+      border-radius: 5px;
+      transition: background-color 0.3s;
+    }
+    .items li:hover {
+      background-color: #f0f0f0;
+    }
+    .items a {
+      color: #232D4B;
+      text-decoration: none;
+      display: block;
+    }
+    .backlink {
+      margin-top: 2rem;
+      text-align: center;
+    }
+    .backlink a {
+      color: #666;
+      text-decoration: none;
+      font-size: 0.9rem;
+    }
+    .backlink a:hover {
+      color: #E57200;
+    }
   </style>
 </head>
 <body>
   <div class="profile">
-    <h1>{{ request.user.username }}'s Profile</h1>
-    {% if profile.profile_picture %}
-      <img src="{{ profile.profile_picture.url }}" alt="Profile Picture">
-    {% else %}
-      <p>No profile picture uploaded.</p>
-    {% endif %}
-    <p>Email: {{ request.user.email }}</p>
-    <p>Bio: {{ profile.bio|default:"No bio provided." }}</p>
-    {% if profile.is_librarian %}
-      <p>is_librarian: true<p>
-    {% else %}
-      <p>is_librarian: false<p>
-    {% endif %}
+    <div class="profile-header">
+      {% if profile.profile_picture %}
+        <img src="{{ profile.profile_picture.url }}" alt="Profile Picture">
+      {% else %}
+        <img src="https://via.placeholder.com/150" alt="Default Profile Picture">
+      {% endif %}
+      <div class="profile-info">
+        <h1>{{ request.user.username }}</h1>
+        <p>Email: {{ request.user.email }}</p>
+        <p>Bio: {{ profile.bio|default:"No bio provided." }}</p>
+        <span class="role-badge">Librarian</span>
+      </div>
+    </div>
     
     <div class="actions">
       <a href="{% url 'image_upload' %}">Upload/Update Profile Picture &amp; Item Image</a>
@@ -45,7 +146,7 @@
     </div>
 
     <div class="backlink">
-      <p><a href="{% url 'librarian-landing' %}">Back to Landing</p>
+      <a href="{% url 'librarian-landing' %}">← Back to Landing</a>
     </div>
   </div>
 </body>
