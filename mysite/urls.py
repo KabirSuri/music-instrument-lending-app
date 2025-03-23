@@ -33,6 +33,8 @@ urlpatterns = [
     path('borrow/<int:item_id>/', views.borrow_item, name="borrow_item"),
     path('items/', views.search_items, name="search_items"),
     path('items/<int:item_id>/', views.item_detail, name="item_detail"),
+    path('create-item/', views.create_item, name='create_item'),
+    path('edit-item/<int:item_id>/', views.edit_item, name='edit_item'),
 ]
 
 if settings.DEBUG:

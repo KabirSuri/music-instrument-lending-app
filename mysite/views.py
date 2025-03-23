@@ -1,22 +1,30 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
-from .models import Item, BorrowRequest, ItemImage
+from django.contrib import messages
+from .models import Item, BorrowRequest, ItemImage, Library
+from .forms import ItemForm
 from django.urls import reverse
 from allauth.socialaccount.providers.google.views import oauth2_login
 
 def login_view(request):
-    if request.method == 'POST':
-        role = request.POST.get('role')
-        username = request.POST.get('username')
-        password = request.POST.get('password')
-        
+    if request.user.is_authenticated:
+        if request.user.profile.is_librarian:
+            return redirect('librarian-landing')
+        else:
+            return redirect('patron-landing')
+    
     return render(request, 'login.html')
 
 def patron_login(request):
     return render(request, 'patron-landing.html')
 
 def librarian_login(request):
-    return render(request, 'librarian-landing.html')
+    items = Item.objects.all()
+    requests = BorrowRequest.objects.filter(approved=False)
+    return render(request, 'librarian-landing.html', {
+        'items': items,
+        'requests': requests
+    })
 
 @login_required
 def profile_view(request):
@@ -83,3 +91,47 @@ def search_items(request):
 def item_detail(request, item_id):
     item = get_object_or_404(Item, id=item_id)
     return render(request, "item_detail.html", {"item": item})
+
+@login_required
+def create_item(request):
+    if not request.user.profile.is_librarian:
+        messages.error(request, "Only librarians can create items.")
+        return redirect('librarian-landing')
+    
+    # Create a default library if none exists
+    if not Library.objects.exists():
+        Library.objects.create(
+            name="Default Library",
+            description="Default library for items"
+        )
+    
+    if request.method == 'POST':
+        form = ItemForm(request.POST, request.FILES)
+        if form.is_valid():
+            item = form.save()
+            messages.success(request, f"Item '{item.title}' created successfully!")
+            return redirect('item_detail', item_id=item.id)
+        else:
+            messages.error(request, "Please correct the errors below.")
+    else:
+        form = ItemForm()
+    
+    return render(request, 'create_item.html', {'form': form})
+
+@login_required
+def edit_item(request, item_id):
+    if not request.user.profile.is_librarian:
+        messages.error(request, "Only librarians can edit items.")
+        return redirect('librarian-landing')
+    
+    item = get_object_or_404(Item, id=item_id)
+    if request.method == 'POST':
+        form = ItemForm(request.POST, request.FILES, instance=item)
+        if form.is_valid():
+            item = form.save()
+            messages.success(request, f"Item '{item.title}' updated successfully!")
+            return redirect('item_detail', item_id=item.id)
+    else:
+        form = ItemForm(instance=item)
+    
+    return render(request, 'edit_item.html', {'form': form, 'item': item})
