@@ -19,19 +19,15 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import path, include
 from django.views.generic import RedirectView
-from django.contrib.auth.views import LogoutView
 from django.contrib import messages
 from django.shortcuts import redirect
 from . import views
 
-def logout_view(request):
-    messages.get_messages(request).used = True
-    return LogoutView.as_view(next_page='login')(request)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('login/', views.login_view, name='login'),
-    path('logout/', logout_view, name='logout'),
+    path('logout/', views.logout_view, name='logout'),
     path('accounts/', include("allauth.urls")),
     path('', views.login_view, name='login'),
     path('patron-landing/', views.patron_login, name='patron-landing'),
