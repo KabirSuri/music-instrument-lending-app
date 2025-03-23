@@ -7,12 +7,15 @@ from django.urls import reverse
 from allauth.socialaccount.providers.google.views import oauth2_login
 
 def login_view(request):
+    # Clear any existing messages
+    storage = messages.get_messages(request)
+    storage.used = True
+    
     if request.user.is_authenticated:
         if request.user.profile.is_librarian:
             return redirect('librarian-landing')
         else:
-            return redirect('patron-landing')
-    
+            return redirect('patron-landing')    
     return render(request, 'login.html')
 
 def patron_login(request):
