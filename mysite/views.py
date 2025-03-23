@@ -4,6 +4,7 @@ from django.contrib import messages
 from .models import Item, BorrowRequest, ItemImage, Library
 from .forms import ItemForm
 from django.urls import reverse
+from django.contrib.auth.views import LogoutView
 from allauth.socialaccount.providers.google.views import oauth2_login
 
 def login_view(request):
@@ -17,6 +18,11 @@ def login_view(request):
         else:
             return redirect('patron-landing')    
     return render(request, 'login.html')
+
+def logout_view(request):
+    storage = messages.get_messages(request)
+    storage.used = True
+    return LogoutView.as_view(next_page='login')(request)
 
 def patron_login(request):
     return render(request, 'patron-landing.html')
@@ -95,8 +101,12 @@ def item_detail(request, item_id):
     item = get_object_or_404(Item, id=item_id)
     return render(request, "item_detail.html", {"item": item})
 
-@login_required
+@login_required(login_url='login')
 def create_item(request):
+    # Check if user is authenticated and is a librarian
+    if not request.user.is_authenticated:
+        return redirect('login')
+    
     if not request.user.profile.is_librarian:
         messages.error(request, "Only librarians can create items.")
         return redirect('librarian-landing')
@@ -107,6 +117,7 @@ def create_item(request):
             name="Default Library",
             description="Default library for items"
         )
+        print("Created default library")  # Debug print
     
     if request.method == 'POST':
         form = ItemForm(request.POST, request.FILES)
@@ -115,9 +126,11 @@ def create_item(request):
             messages.success(request, f"Item '{item.title}' created successfully!")
             return redirect('item_detail', item_id=item.id)
         else:
+            print("Form errors:", form.errors)  # Debug print
             messages.error(request, "Please correct the errors below.")
     else:
         form = ItemForm()
+        print("Rendering create item form")  # Debug print
     
     return render(request, 'create_item.html', {'form': form})
 
