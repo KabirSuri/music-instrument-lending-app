@@ -1,8 +1,9 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from .models import Item, BorrowRequest, ItemImage, Library
-from .forms import ItemForm
+from django.db.models import Q
+from .models import Item, BorrowRequest, ItemImage, Library, UserProfile
+from .forms import ItemForm, ProfileImageForm
 from django.urls import reverse
 from django.contrib.auth.views import LogoutView
 from allauth.socialaccount.providers.google.views import oauth2_login
@@ -13,10 +14,7 @@ def login_view(request):
     storage.used = True
     
     if request.user.is_authenticated:
-        if request.user.profile.is_librarian:
-            return redirect('librarian-landing')
-        else:
-            return redirect('patron-landing')    
+        return redirect('catalog')
     return render(request, 'login.html')
 
 def logout_view(request):
@@ -37,14 +35,23 @@ def librarian_login(request):
 
 @login_required
 def profile_view(request):
-    # Renders a different template for librarians  and patrons
-    # Anonymous users are redirected to the login page
-    profile = request.user.profile
-    context = {'profile': profile}
-    if profile.is_librarian:
-        return render(request, 'librarian_profile.html', context)
+    if request.method == 'POST':
+        if 'clear_picture' in request.POST:
+            # Clear the profile picture
+            request.user.profile.profile_picture = None
+            request.user.profile.save()
+            messages.success(request, 'Profile picture cleared successfully!')
+            return redirect('profile')
+            
+        form = ProfileImageForm(request.POST, request.FILES, instance=request.user.profile)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Profile picture updated successfully!')
+            return redirect('profile')
     else:
-        return render(request, 'patron_profile.html', context)
+        form = ProfileImageForm(instance=request.user.profile)
+    
+    return render(request, 'profile.html', {'form': form})
 
 @login_required
 def image_upload_view(request):
@@ -151,3 +158,21 @@ def edit_item(request, item_id):
         form = ItemForm(instance=item)
     
     return render(request, 'edit_item.html', {'form': form, 'item': item})
+
+def catalog_view(request):
+    """Display the catalog of all items with search functionality."""
+    query = request.GET.get('q', '')
+    
+    if query:
+        items = Item.objects.filter(
+            Q(title__icontains=query) |
+            Q(description__icontains=query) |
+            Q(primary_identifier__icontains=query)
+        )
+    else:
+        items = Item.objects.all()
+    
+    return render(request, "catalog.html", {
+        "items": items,
+        "query": query
+    })

@@ -1,0 +1,151 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block extra_css %}
+<style>
+    .catalog-header {
+        background-color: var(--uva-blue);
+        color: white;
+        padding: 2rem 0;
+        margin-bottom: 2rem;
+    }
+
+    .item-card {
+        height: 100%;
+        transition: transform 0.2s;
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
+        overflow: hidden;
+    }
+
+    .item-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 5px 15px rgba(35, 45, 75, 0.1);
+    }
+
+    .item-image {
+        height: 200px;
+        object-fit: cover;
+        width: 100%;
+    }
+
+    .item-status {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        padding: 5px 10px;
+        border-radius: 15px;
+        font-size: 0.8rem;
+        font-weight: bold;
+    }
+
+    .status-checked_in {
+        background-color: #28a745;
+        color: white;
+    }
+
+    .status-in_circulation {
+        background-color: var(--uva-orange);
+        color: white;
+    }
+
+    .status-being_repaired {
+        background-color: #dc3545;
+        color: white;
+    }
+
+    .add-item-btn {
+        background-color: var(--uva-blue);
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 5px;
+        transition: background-color 0.3s;
+    }
+
+    .add-item-btn:hover {
+        background-color: var(--uva-orange);
+        color: white;
+    }
+
+    .search-box {
+        max-width: 500px;
+        margin: 0 auto 2rem auto;
+    }
+
+    .search-input {
+        border: 2px solid var(--uva-blue);
+        border-radius: 25px;
+        padding: 10px 20px;
+    }
+
+    .search-input:focus {
+        border-color: var(--uva-orange);
+        box-shadow: 0 0 0 0.2rem rgba(229, 114, 0, 0.25);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="catalog-header">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <h1 class="mb-0">Library Catalog</h1>
+            </div>
+            {% if user.profile.is_librarian %}
+            <div class="col-md-4 text-md-end">
+                <a href="{% url 'create-item' %}" class="btn add-item-btn">
+                    <i class="fas fa-plus"></i> Add New Item
+                </a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    <div class="search-box">
+        <form method="get" class="mb-4">
+            <div class="input-group">
+                <input type="text" name="q" class="form-control search-input" 
+                       placeholder="Search items..." value="{{ query|default:'' }}">
+                <button type="submit" class="btn btn-primary">Search</button>
+            </div>
+        </form>
+    </div>
+
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+        {% for item in items %}
+        <div class="col">
+            <div class="card item-card">
+                <div class="position-relative">
+                    {% if item.images.first %}
+                        <img src="{{ item.images.first.image.url }}" class="item-image" alt="{{ item.title }}">
+                    {% else %}
+                        <img src="{% static 'images/default-item.png' %}" class="item-image" alt="Default Item Image">
+                    {% endif %}
+                    <div class="item-status status-{{ item.status }}">
+                        {{ item.get_status_display }}
+                    </div>
+                </div>
+                <div class="card-body">
+                    <h5 class="card-title">{{ item.title }}</h5>
+                    <p class="card-text">{{ item.description|truncatewords:20 }}</p>
+                    <p class="card-text"><small class="text-muted">ID: {{ item.primary_identifier }}</small></p>
+                    <a href="{% url 'item_detail' item.id %}" class="btn btn-primary">View Details</a>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12 text-center">
+            <p class="lead">No items found.</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://kit.fontawesome.com/a076d05399.js"></script>
+{% endblock %} 

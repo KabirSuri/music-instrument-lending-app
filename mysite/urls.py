@@ -29,7 +29,7 @@ urlpatterns = [
     path('login/', views.login_view, name='login'),
     path('logout/', views.logout_view, name='logout'),
     path('accounts/', include("allauth.urls")),
-    path('', views.login_view, name='login'),
+    path('', views.catalog_view, name='catalog'),
     path('patron-landing/', views.patron_login, name='patron-landing'),
     path('librarian-landing/', views.librarian_login, name='librarian-landing'),
     path('profile/', views.profile_view, name='profile'),
@@ -37,8 +37,8 @@ urlpatterns = [
     path('borrow/<int:item_id>/', views.borrow_item, name="borrow_item"),
     path('items/', views.search_items, name="search_items"),
     path('items/<int:item_id>/', views.item_detail, name="item_detail"),
-    path('create-item/', views.create_item, name='create_item'),
-    path('edit-item/<int:item_id>/', views.edit_item, name='edit_item'),
+    path('create-item/', views.create_item, name='create-item'),
+    path('edit-item/<int:item_id>/', views.edit_item, name='edit-item'),
 ]
 
 if settings.DEBUG:

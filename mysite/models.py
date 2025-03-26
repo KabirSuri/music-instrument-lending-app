@@ -6,10 +6,19 @@ from allauth.account.signals import user_signed_up
 from django.utils import timezone
 from datetime import timedelta
 from allauth.socialaccount.models import SocialAccount
+from imagekit.models import ProcessedImageField
+from imagekit.processors import ResizeToFill
 
 class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
-    profile_picture = models.ImageField(upload_to='profile_images/', null=True, blank=True)
+    profile_picture = ProcessedImageField(
+        upload_to='profile_images/',
+        processors=[ResizeToFill(300, 300)],
+        format='JPEG',
+        options={'quality': 90},
+        null=True,
+        blank=True
+    )
     bio = models.TextField(blank=True, null=True)
     date_joined = models.DateTimeField(auto_now_add=True)
     is_librarian = models.BooleanField(default=False)
