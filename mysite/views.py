@@ -23,7 +23,25 @@ def logout_view(request):
     return LogoutView.as_view(next_page='login')(request)
 
 def patron_login(request):
-    return render(request, 'patron-landing.html')
+    # Get current user's borrowed items (approved requests with due dates)
+    borrowed_items = BorrowRequest.objects.filter(
+        user=request.user,
+        approved=True,
+        due_date__isnull=False
+    ).order_by('due_date')
+
+    # Get pending requests
+    pending_requests = BorrowRequest.objects.filter(
+        user=request.user,
+        approved=False
+    ).order_by('-requested_at')
+
+    context = {
+        'borrowed_items': borrowed_items,
+        'pending_requests': pending_requests,
+    }
+    
+    return render(request, 'patron-landing.html', context)
 
 def librarian_login(request):
     items = Item.objects.all()
