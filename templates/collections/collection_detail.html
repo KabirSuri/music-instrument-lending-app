@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-4">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'collections' %}">Collections</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ collection.title }}</li>
+        </ol>
+    </nav>
+
+    <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h2 class="mb-0">{{ collection.title }}</h2>
+            {% if user.profile.is_librarian %}
+                <a href="{% url 'edit-collection' collection.id %}" class="btn btn-outline-primary">
+                    <i class="fas fa-edit"></i> Edit Collection
+                </a>
+            {% endif %}
+        </div>
+        <div class="card-body">
+            <div class="mb-4">
+                <p class="text-muted">{{ collection.description }}</p>
+                <div class="d-flex gap-2">
+                    <span class="badge {% if collection.is_public %}bg-success{% else %}bg-secondary{% endif %}">
+                        {{ collection.is_public|yesno:"Public,Private" }}
+                    </span>
+                    <span class="badge bg-info">{{ collection.items.count }} items</span>
+                </div>
+            </div>
+
+            <h4 class="mb-3">Items in Collection</h4>
+            {% if collection.items.all %}
+                <div class="list-group">
+                    {% for item in collection.items.all %}
+                        <div class="list-group-item">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h5 class="mb-1">{{ item.title }}</h5>
+                                    <p class="mb-1 text-muted">{{ item.description|truncatewords:30 }}</p>
+                                    <small>ID: {{ item.primary_identifier }}</small>
+                                </div>
+                                <a href="{% url 'item_detail' item.id %}" class="btn btn-sm btn-outline-primary">
+                                    <i class="fas fa-eye"></i> View Item
+                                </a>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="text-center py-4">
+                    <i class="fas fa-box-open fa-3x text-muted mb-3"></i>
+                    <p class="lead text-muted">No items in this collection</p>
+                    {% if user.profile.is_librarian %}
+                        <a href="{% url 'edit-collection' collection.id %}" class="btn btn-primary">
+                            Add Items
+                        </a>
+                    {% endif %}
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %} 

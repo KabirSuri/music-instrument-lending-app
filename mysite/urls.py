@@ -39,6 +39,11 @@ urlpatterns = [
     path('items/<int:item_id>/', views.item_detail, name="item_detail"),
     path('create-item/', views.create_item, name='create-item'),
     path('edit-item/<int:item_id>/', views.edit_item, name='edit-item'),
+    # Collection URLs
+    path('collections/', views.collection_list, name='collections'),
+    path('collections/create/', views.create_collection, name='create-collection'),
+    path('collections/<int:collection_id>/', views.collection_detail, name='collection-detail'),
+    path('collections/<int:collection_id>/edit/', views.edit_collection, name='edit-collection'),
 ]
 
 if settings.DEBUG:
