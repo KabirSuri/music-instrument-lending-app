@@ -43,7 +43,14 @@ def patron_login(request):
     
     return render(request, 'patron-landing.html', context)
 
+@login_required
 def librarian_login(request):
+    # Set user as librarian when they access this page
+    if not request.user.profile.is_librarian:
+        request.user.profile.is_librarian = True
+        request.user.profile.save()
+        messages.success(request, "Your account has been updated to librarian status.")
+
     # Get pending borrow requests
     requests = BorrowRequest.objects.filter(approved=False).order_by('-requested_at')
     

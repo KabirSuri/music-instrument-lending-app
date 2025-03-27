@@ -39,7 +39,7 @@ def update_user_role(user, request):
     """
     Helper function to update user role based on the login URL
     """
-    if request and request.GET.get('next', '').startswith('/librarian-landing'):
+    if request and request.GET.get('next', '').endswith('librarian-landing/'):
         print(f"Setting user {user.email} as librarian")
         user.profile.is_librarian = True
     else:
