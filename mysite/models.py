@@ -2,7 +2,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from allauth.account.signals import user_signed_up
+from allauth.account.signals import user_signed_up, user_logged_in
 from django.utils import timezone
 from datetime import timedelta
 from allauth.socialaccount.models import SocialAccount
@@ -35,11 +35,26 @@ def create_user_profile(sender, instance, created, **kwargs):
 def save_user_profile(sender, instance, **kwargs):
     instance.profile.save()
 
+def update_user_role(user, request):
+    """
+    Helper function to update user role based on the login URL
+    """
+    if request and request.GET.get('next', '').startswith('/librarian-landing'):
+        print(f"Setting user {user.email} as librarian")
+        user.profile.is_librarian = True
+    else:
+        print(f"Setting user {user.email} as patron")
+        user.profile.is_librarian = False
+    user.profile.save()
+
 @receiver(user_signed_up)
 def populate_profile(request, user, **kwargs):
     """
     When a user signs up via Google, this pulls their profile data from the Google account
+    and sets their role based on the login URL.
     """
+    print(f"populate_profile signal triggered for user: {user.email}")
+    
     if SocialAccount.objects.filter(user=user, provider='google').exists():
         social_account = SocialAccount.objects.get(user=user, provider='google')
         user_data = social_account.extra_data
@@ -48,17 +63,15 @@ def populate_profile(request, user, **kwargs):
         if 'picture' in user_data:
             user.profile.profile_picture = user_data['picture']
     
-    # set librarian variable on librarian logins
-    # role setting didnt work
-    # intermediary view didnt work
-    next_url = request.GET.get('next', '')
-    if next_url.startswith('/librarian-landing'):
-        user.profile.is_librarian = True
-    else:
-        user.profile.is_librarian = False
+    update_user_role(user, request)
 
-    # Save the updated profile
-    user.profile.save()
+@receiver(user_logged_in)
+def update_role_on_login(request, user, **kwargs):
+    """
+    When a user logs in, update their role based on the login URL
+    """
+    print(f"update_role_on_login signal triggered for user: {user.email}")
+    update_user_role(user, request)
 
 # Maybe unneeded, unclear if we will ever have >1 library https://s25.cs3240.org/project.html#libraries
 class Library(models.Model):
