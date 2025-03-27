@@ -132,38 +132,38 @@ def item_detail(request, item_id):
     item = get_object_or_404(Item, id=item_id)
     return render(request, "item_detail.html", {"item": item})
 
-@login_required(login_url='login')
+@login_required
 def create_item(request):
-    # Check if user is authenticated and is a librarian
-    if not request.user.is_authenticated:
-        return redirect('login')
-    
     if not request.user.profile.is_librarian:
         messages.error(request, "Only librarians can create items.")
-        return redirect('librarian-landing')
-    
-    # Create a default library if none exists
-    if not Library.objects.exists():
-        Library.objects.create(
-            name="Default Library",
-            description="Default library for items"
-        )
-        print("Created default library")  # Debug print
-    
+        return redirect('catalog')
+
     if request.method == 'POST':
-        form = ItemForm(request.POST, request.FILES)
-        if form.is_valid():
-            item = form.save()
-            messages.success(request, f"Item '{item.title}' created successfully!")
-            return redirect('item_detail', item_id=item.id)
-        else:
-            print("Form errors:", form.errors)  # Debug print
-            messages.error(request, "Please correct the errors below.")
-    else:
-        form = ItemForm()
-        print("Rendering create item form")  # Debug print
-    
-    return render(request, 'create_item.html', {'form': form})
+        # Get the default library (assuming single library system)
+        library = Library.objects.first()
+        if not library:
+            library = Library.objects.create(name="Main Library")
+
+        # Create the item
+        item = Item.objects.create(
+            title=request.POST.get('title'),
+            primary_identifier=request.POST.get('primary_identifier'),
+            description=request.POST.get('description'),
+            status=request.POST.get('status'),
+            library=library
+        )
+
+        # Handle image upload
+        if 'image' in request.FILES:
+            ItemImage.objects.create(
+                item=item,
+                image=request.FILES['image']
+            )
+
+        messages.success(request, f"Item '{item.title}' created successfully!")
+        return redirect('item_detail', item_id=item.id)
+
+    return render(request, 'create_item.html')
 
 @login_required
 def edit_item(request, item_id):
