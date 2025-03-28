@@ -192,18 +192,20 @@ def edit_item(request, item_id):
 
 @login_required
 def delete_item(request, item_id):
+    """Delete an existing item."""
+    if not request.user.profile.is_librarian:
+        messages.error(request, "Only librarians can delete items.")
+        return redirect('catalog')
+    
     item = get_object_or_404(Item, id=item_id)
     
-    if not request.user.profile.is_librarian:
-        messages.error(request, "You don't have permission to delete this item.")
-        return redirect('item_detail', item_id=item_id)
-
     if request.method == 'POST':
+        item_title = item.title  # Save title before deletion for messaging
         item.delete()
-        messages.success(request, "Item deleted successfully.")
-        return redirect('catalog')  # or wherever you want to redirect after deletion
-
-    return redirect('item_detail', item_id=item_id)
+        messages.success(request, f"Item '{item_title}' deleted successfully!")
+        return redirect('catalog')  # Adjust if your item list URL is different
+    
+    return redirect('item_detail', item_id=item.id)
 
 def catalog_view(request):
     """Display the catalog of all items with search functionality."""
@@ -323,3 +325,19 @@ def edit_collection(request, collection_id):
         'collection': collection,
         'items': items
     })
+
+def delete_collection(request, collection_id):
+    """Delete an existing collection."""
+    if not request.user.profile.is_librarian:
+        messages.error(request, "Only librarians can delete collections.")
+        return redirect('catalog')
+    
+    collection = get_object_or_404(Collection, id=collection_id)
+    
+    if request.method == 'POST':
+        collection_title = collection.title  # Store for message before deletion
+        collection.delete()
+        messages.success(request, f"Collection '{collection_title}' deleted successfully!")
+        return redirect('collections')  # Adjust if your collections list URL is different
+    
+    return redirect('collection-detail', collection_id=collection.id)

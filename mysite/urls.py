@@ -45,6 +45,8 @@ urlpatterns = [
     path('collections/create/', views.create_collection, name='create-collection'),
     path('collections/<int:collection_id>/', views.collection_detail, name='collection-detail'),
     path('collections/<int:collection_id>/edit/', views.edit_collection, name='edit-collection'),
+    path('collections/<int:collection_id>/delete/', views.delete_collection, name='delete-collection'),
+
 ]
 
 if settings.DEBUG:
