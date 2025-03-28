@@ -240,13 +240,15 @@ def create_collection(request):
         title = request.POST.get('title')
         description = request.POST.get('description')
         is_public = request.POST.get('is_public') == 'on'
-        
+        default_library=Library.objects.get(id=1) #the single library in this project
+
         if title:
             collection = Collection.objects.create(
                 title=title,
                 description=description,
                 is_public=is_public,
-                created_by=request.user
+                creator=request.user,
+                library=default_library
             )
             
             # Handle selected items

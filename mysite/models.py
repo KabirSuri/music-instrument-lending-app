@@ -144,10 +144,24 @@ class BorrowRequest(models.Model):
 class Collection(models.Model):
     title = models.CharField(max_length=255)
     description = models.TextField(blank=True, null=True)
+    creator = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        default=1,
+        related_name='collections_created'
+        )
     is_public = models.BooleanField(default=True)
-    library = models.ForeignKey(Library, on_delete=models.CASCADE, related_name='collections')
-    # Users who can access a PRIVATE collection (librarians bypass this automatically)
-    allowed_users = models.ManyToManyField(User, blank=True)
+    library = models.ForeignKey(
+        Library, 
+        on_delete=models.CASCADE, 
+        related_name='collections'
+    )
+    # Users who can access a PRIVATE collection (librarians bypass this automatically
+    allowed_users = models.ManyToManyField(
+        User, 
+        blank=True,
+        related_name='collections_allowed'
+    )
     
     def __str__(self):
         return self.title
