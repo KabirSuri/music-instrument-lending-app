@@ -190,6 +190,21 @@ def edit_item(request, item_id):
     
     return render(request, 'edit_item.html', {'form': form, 'item': item})
 
+@login_required
+def delete_item(request, item_id):
+    item = get_object_or_404(Item, id=item_id)
+    
+    if not request.user.profile.is_librarian:
+        messages.error(request, "You don't have permission to delete this item.")
+        return redirect('item_detail', item_id=item_id)
+
+    if request.method == 'POST':
+        item.delete()
+        messages.success(request, "Item deleted successfully.")
+        return redirect('catalog')  # or wherever you want to redirect after deletion
+
+    return redirect('item_detail', item_id=item_id)
+
 def catalog_view(request):
     """Display the catalog of all items with search functionality."""
     query = request.GET.get('q', '')
