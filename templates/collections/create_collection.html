@@ -23,6 +23,7 @@
                             <textarea class="form-control" id="description" name="description" rows="3"></textarea>
                         </div>
                         
+                        {% if user.profile.is_librarian %}
                         <div class="mb-3">
                             <div class="form-check">
                                 <input class="form-check-input" type="checkbox" id="is_public" name="is_public" checked>
@@ -31,6 +32,7 @@
                                 </label>
                             </div>
                         </div>
+                        {% endif %}
                         
                         <div class="mb-3">
                             <label class="form-label">Select Items</label>
@@ -62,4 +64,4 @@
         </div>
     </div>
 </div>
-{% endblock %} 
+{% endblock %}

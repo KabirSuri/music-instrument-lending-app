@@ -132,6 +132,46 @@
             </div>
         </div>
     </div>
+
+    <!-- Recent Collections -->
+    <div class="row g-4 mt-4">
+        <div class="col-12">
+            <div class="dashboard-card card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-layer-group"></i> Recent Collections</h5>
+                </div>
+                <div class="card-body">
+                    {% if collections %}
+                        <div class="list-group list-group-flush">
+                        {% for collection in collections %}
+                            <div class="list-group-item d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="mb-1">{{ collection.title }}</h6>
+                                    <small class="text-muted">
+                                        {{ collection.items.count }} items
+                                        <span class="badge bg-success">Public</span>
+                                    </small>
+                                </div>
+                                <div>
+                                    {% if request.user == collection.creator or request.user.profile.is_librarian %}
+                                        <a href="{% url 'edit-collection' collection.id %}" class="btn btn-sm btn-outline-primary">Edit</a>
+                                    {% endif %}
+                                    <a href="{% url 'collection-detail' collection.id %}" class="btn btn-sm btn-outline-secondary">View</a>
+                                </div>
+                            </div>
+                        {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="empty-state">
+                            <i class="fas fa-folder-open"></i>
+                            <p>No collections available</p>
+                            <a href="{% url 'create-collection' %}" class="btn btn-primary">Create a Collection</a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 {% endblock %}
 

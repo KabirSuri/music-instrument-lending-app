@@ -13,7 +13,7 @@
     <div class="card">
         <div class="card-header d-flex justify-content-between align-items-center">
             <h2 class="mb-0">{{ collection.title }}</h2>
-            {% if user.profile.is_librarian %}
+            {% if user.profile.is_librarian or user == collection.creator %}
                 <a href="{% url 'edit-collection' collection.id %}" class="btn btn-outline-primary">
                     <i class="fas fa-edit"></i> Edit Collection
                 </a>
@@ -52,7 +52,7 @@
                 <div class="text-center py-4">
                     <i class="fas fa-box-open fa-3x text-muted mb-3"></i>
                     <p class="lead text-muted">No items in this collection</p>
-                    {% if user.profile.is_librarian %}
+                    {% if user.profile.is_librarian or user == collection.creator %}
                         <a href="{% url 'edit-collection' collection.id %}" class="btn btn-primary">
                             Add Items
                         </a>
@@ -62,4 +62,4 @@
         </div>
     </div>
 </div>
-{% endblock %} 
+{% endblock %}

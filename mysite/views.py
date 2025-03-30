@@ -227,20 +227,25 @@ def catalog_view(request):
 
 @login_required
 def collection_list(request):
-    """Display all collections with search functionality."""
-    if not request.user.profile.is_librarian:
-        messages.error(request, "Only librarians can view collections.")
-        return redirect('catalog')
-    
+    """Display collections with search functionality.
+       Librarians see all collections; patrons only see public collections.
+    """
     query = request.GET.get('q', '')
-    if query:
-        collections = Collection.objects.filter(
-            Q(title__icontains=query) |
-            Q(description__icontains=query)
-        )
-    else:
+    if request.user.profile.is_librarian:
         collections = Collection.objects.all().order_by('-id')
-    
+        if query:
+            collections = collections.filter(
+                Q(title__icontains=query) |
+                Q(description__icontains=query)
+            )
+    else:
+        # Patrons see only public collections.
+        collections = Collection.objects.filter(is_public=True).order_by('-id')
+        if query:
+            collections = collections.filter(
+                Q(title__icontains=query) |
+                Q(description__icontains=query)
+            )
     return render(request, 'collections/collection_list.html', {
         'collections': collections,
         'query': query
@@ -249,15 +254,16 @@ def collection_list(request):
 @login_required
 def create_collection(request):
     """Create a new collection."""
-    if not request.user.profile.is_librarian:
-        messages.error(request, "Only librarians can create collections.")
-        return redirect('catalog')
-    
+    default_library = Library.objects.get(id=1) #the single library in this project
+
     if request.method == 'POST':
         title = request.POST.get('title')
         description = request.POST.get('description')
-        is_public = request.POST.get('is_public') == 'on'
-        default_library=Library.objects.get(id=1) #the single library in this project
+        # Librarians can choose private; Patrons forced public
+        if request.user.profile.is_librarian:
+            is_public = request.POST.get('is_public') == 'on'
+        else:
+            is_public = True
 
         if title:
             collection = Collection.objects.create(
@@ -268,7 +274,6 @@ def create_collection(request):
                 library=default_library
             )
             
-            # Handle selected items
             item_ids = request.POST.getlist('items')
             if item_ids:
                 items = Item.objects.filter(id__in=item_ids)
@@ -297,16 +302,19 @@ def collection_detail(request, collection_id):
 @login_required
 def edit_collection(request, collection_id):
     """Edit an existing collection."""
-    if not request.user.profile.is_librarian:
-        messages.error(request, "Only librarians can edit collections.")
-        return redirect('catalog')
-    
     collection = get_object_or_404(Collection, id=collection_id)
+    
+    if not (request.user.profile.is_librarian or collection.creator == request.user):
+        messages.error(request, "You don't have permission to edit this collection.")
+        return redirect('catalog')
     
     if request.method == 'POST':
         collection.title = request.POST.get('title', collection.title)
         collection.description = request.POST.get('description', collection.description)
-        collection.is_public = request.POST.get('is_public') == 'on'
+        if request.user.profile.is_librarian:
+            collection.is_public = request.POST.get('is_public') == 'on'
+        else:
+            collection.is_public = True 
         collection.save()
         
         # Update items
@@ -326,18 +334,19 @@ def edit_collection(request, collection_id):
         'items': items
     })
 
+@login_required
 def delete_collection(request, collection_id):
     """Delete an existing collection."""
-    if not request.user.profile.is_librarian:
-        messages.error(request, "Only librarians can delete collections.")
-        return redirect('catalog')
-    
     collection = get_object_or_404(Collection, id=collection_id)
     
+    if not (request.user.profile.is_librarian or collection.creator == request.user):
+        messages.error(request, "You don't have permission to delete this collection.")
+        return redirect('catalog')
+    
     if request.method == 'POST':
-        collection_title = collection.title  # Store for message before deletion
+        collection_title = collection.title
         collection.delete()
         messages.success(request, f"Collection '{collection_title}' deleted successfully!")
-        return redirect('collections')  # Adjust if your collections list URL is different
+        return redirect('collections')
     
     return redirect('collection-detail', collection_id=collection.id)
