@@ -55,6 +55,25 @@
         color: var(--uva-blue);
         margin-bottom: 1rem;
     }
+    .collection-item {
+        display: flex;
+        align-items: center;
+        padding: 1rem;
+        border-bottom: 1px solid #eee;
+    }
+
+    .collection-item:last-child {
+        border-bottom: none;
+    }
+
+    .collection-info {
+        flex-grow: 1;
+    }
+
+    .collection-actions {
+        display: flex;
+        gap: 0.5rem;
+    }
 </style>
 {% endblock %}
 
@@ -153,7 +172,7 @@
                                     </small>
                                 </div>
                                 <div>
-                                    {% if request.user == collection.creator or request.user.profile.is_librarian %}
+                                    {% if user == collection.creator %}
                                         <a href="{% url 'edit-collection' collection.id %}" class="btn btn-sm btn-outline-primary">Edit</a>
                                     {% endif %}
                                     <a href="{% url 'collection-detail' collection.id %}" class="btn btn-sm btn-outline-secondary">View</a>
@@ -165,9 +184,12 @@
                         <div class="empty-state">
                             <i class="fas fa-folder-open"></i>
                             <p>No collections available</p>
-                            <a href="{% url 'create-collection' %}" class="btn btn-primary">Create a Collection</a>
                         </div>
                     {% endif %}
+                    <div class="col-12">
+                        <a href="{% url 'create-collection' %}" class="btn btn-primary">Create a Collection</a>
+                        <a href="{% url 'collections' %}" class="btn btn-primary">View Collections</a>
+                    </div>
                 </div>
             </div>
         </div>

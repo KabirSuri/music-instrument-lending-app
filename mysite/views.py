@@ -36,9 +36,13 @@ def patron_login(request):
         approved=False
     ).order_by('-requested_at')
 
+    # Get recent collections
+    collections = Collection.objects.filter(is_public=True).order_by('-id')[:5]  # Get 5 most recent PUBLIC collections
+
     context = {
         'borrowed_items': borrowed_items,
         'pending_requests': pending_requests,
+        'collections': collections,
     }
     
     return render(request, 'patron-landing.html', context)
@@ -54,7 +58,6 @@ def librarian_login(request):
     # Get pending borrow requests
     requests = BorrowRequest.objects.filter(approved=False).order_by('-requested_at')
     
-    # Get recent collections
     collections = Collection.objects.all().order_by('-id')[:5]  # Get 5 most recent collections
     
     context = {
