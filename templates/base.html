@@ -14,6 +14,14 @@
             --uva-light-blue: #2C365E;
         }
         
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+        }
+
         .navbar {
             background-color: var(--uva-blue) !important;
         }
@@ -41,9 +49,15 @@
             color: white;
         }
         
+        main {
+            flex: 1;
+            width: 100%;
+        }
+
         footer {
             background-color: var(--uva-blue) !important;
             color: white;
+            padding: 1rem 0;
         }
 
         .nav-link i {
@@ -101,6 +115,7 @@
     <footer class="py-3 mt-5">
         <div class="container text-center">
             <p class="mb-0">&copy; {% now "Y" %} Library Management System. All rights reserved.</p>
+            <p>Disclaimer: This is a demo project for educational purposes only.</p>
         </div>
     </footer>
 
