@@ -2,8 +2,8 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.db.models import Q
-from .models import Item, BorrowRequest, ItemImage, Library, UserProfile, Collection
-from .forms import ItemForm, ProfileImageForm
+from .models import Item, BorrowRequest, ItemImage, Library, UserProfile, Collection, Rating
+from .forms import ItemForm, ProfileImageForm, RatingForm
 from django.urls import reverse
 from django.contrib.auth.views import LogoutView
 from allauth.socialaccount.providers.google.views import oauth2_login
@@ -353,3 +353,19 @@ def delete_collection(request, collection_id):
         return redirect('collections')
     
     return redirect('collection-detail', collection_id=collection.id)
+
+@login_required
+def rate_item(request, item_id):
+    item = get_object_or_404(Item, id=item_id)
+    if request.method == 'POST':
+        form = RatingForm(request.POST)
+        if form.is_valid():
+            rating, created = Rating.objects.update_or_create(
+                item=item,
+                user=request.user,
+                defaults={'stars': form.cleaned_data['stars']}
+            )
+            return redirect('item_detail', item_id=item.id)
+    else:
+        form = RatingForm()
+    return render(request, 'rate_item.html', {'item': item, 'form': form})

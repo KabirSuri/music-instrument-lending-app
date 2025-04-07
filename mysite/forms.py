@@ -1,5 +1,5 @@
 from django import forms
-from .models import Item, ItemImage, Library, Collection, UserProfile
+from .models import Item, ItemImage, Library, Collection, UserProfile, Rating
 
 class ItemForm(forms.ModelForm):
     image = forms.ImageField(required=False, label='Item Image')
@@ -28,3 +28,11 @@ class ProfileImageForm(forms.ModelForm):
             if image.size > 5*1024*1024:  # 5MB limit
                 raise forms.ValidationError("Image file too large ( > 5MB )")
         return image 
+    
+class RatingForm(forms.ModelForm):
+    class Meta:
+        model = Rating
+        fields = ['stars']
+        widgets = {
+            'stars': forms.NumberInput(attrs={'min': 1, 'max': 5, 'step': 1}),
+        }

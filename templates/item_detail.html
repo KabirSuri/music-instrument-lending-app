@@ -46,10 +46,33 @@
 
                         <dt class="col-sm-3">Description</dt>
                         <dd class="col-sm-9">{{ item.description|default:"No description available." }}</dd>
-                    </dl>
 
+                        <dt class="col-sm-3">Average Rating</dt>
+                        <dd class="col-sm-9">
+                            {% if item.reviews.exists %}
+                                {{ item.average_rating|floatformat:1 }} / 5
+                            {% else %}
+                                No ratings yet.
+                            {% endif %}
+                        </dd>
+                    </dl>
                 </div>
             </div>
+
+            <hr>
+            <h3 class="mb-3">Add Your Rating</h3>
+            <form method="post" action="{% url 'rate_item' item.id %}">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label for="rating" class="form-label">Rating (1-5)</label>
+                    <input type="number" name="stars" id="rating" class="form-control" min="1" max="5" required>
+                </div>
+                <div class="mb-3">
+                    <label for="comment" class="form-label">Comment</label>
+                    <textarea name="comment" id="comment" class="form-control" rows="3"></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary">Submit Rating</button>
+            </form>
 
             {% if item.reviews.exists %}
                 <hr>
