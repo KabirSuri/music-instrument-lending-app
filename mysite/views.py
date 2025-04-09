@@ -116,15 +116,18 @@ def image_upload_view(request):
 def borrow_item(request, item_id):
     item = get_object_or_404(Item, id=item_id)
 
-    # Prevent duplicate requests
-    existing_request = BorrowRequest.objects.filter(item=item, user=request.user, approved=False).exists()
-    if existing_request:
-        return redirect('item_detail', item_id=item.id)
+    borrow_request = BorrowRequest.objects.filter(item=item, user=request.user, approved=False).first()
 
-    # Create a borrow request
-    BorrowRequest.objects.create(item=item, user=request.user)
+    if borrow_request:
+        # Cancel the existing borrow request if it’s pending (approved=False)
+        borrow_request.delete()
+        messages.success(request, f"Your borrow request for '{item.title}' has been canceled.")
+    else:
+        # Create a new borrow request if it doesn’t exist
+        BorrowRequest.objects.create(item=item, user=request.user)
+        messages.success(request, f"Your borrow request for '{item.title}' has been submitted.")
 
-    return redirect('item_detail', item_id=item.id)  # Redirect back to item page
+    return redirect('item_detail', item_id=item.id)  # Redirect back to the item detail page
 
 def search_items(request):
     """Display and search for items."""
@@ -138,9 +141,21 @@ def search_items(request):
     return render(request, "item_list.html", {"items": items, "query": query})
 
 
+#def item_detail(request, item_id):
+#    item = get_object_or_404(Item, id=item_id)
+#    return render(request, "item_detail.html", {"item": item})
+
+@login_required
 def item_detail(request, item_id):
     item = get_object_or_404(Item, id=item_id)
-    return render(request, "item_detail.html", {"item": item})
+
+    # Check if the user has already requested to borrow the item
+    has_requested = BorrowRequest.objects.filter(item=item, user=request.user, approved=False).exists()
+
+    return render(request, 'item_detail.html', {
+        'item': item,
+        'has_requested': has_requested,  # Pass this variable to the template
+    })
 
 @login_required
 def create_item(request):
