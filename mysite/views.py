@@ -2,8 +2,8 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.db.models import Q
-from .models import Item, BorrowRequest, ItemImage, Library, UserProfile, Collection
-from .forms import ItemForm, ProfileImageForm
+from .models import Item, BorrowRequest, ItemImage, Library, UserProfile, Collection, LikeDislike
+from .forms import ItemForm, ProfileImageForm, ProfileTextForm
 from django.urls import reverse
 from django.contrib.auth.views import LogoutView
 from allauth.socialaccount.providers.google.views import oauth2_login
@@ -67,51 +67,115 @@ def librarian_login(request):
     
     return render(request, 'librarian-landing.html', context)
 
+# @login_required
+# def profile_view(request):
+#     if request.method == 'POST':
+#         if 'clear_picture' in request.POST:
+#             # Clear the profile picture
+#             request.user.profile.profile_picture = None
+#             request.user.profile.save()
+#             messages.success(request, 'Profile picture cleared successfully!')
+#             return redirect('profile')
+#
+#         form = ProfileImageForm(request.POST, request.FILES, instance=request.user.profile)
+#         if form.is_valid():
+#             form.save()
+#             messages.success(request, 'Profile picture updated successfully!')
+#             return redirect('profile')
+#     else:
+#         form = ProfileImageForm(instance=request.user.profile)
+#
+#     return render(request, 'profile.html', {'form': form})
+#
+# @login_required
+# def image_upload_view(request):
+#     profile = request.user.profile
+#     if request.method == 'POST':
+#         if 'profile_image_file' in request.FILES:
+#             profile.profile_picture = request.FILES['profile_image_file']
+#             profile.save()
+#
+#         # Librarians (ONLY) can also add an image to an item
+#         if profile.is_librarian and request.POST.get('item_id'):
+#             item_id = request.POST.get('item_id')
+#             if 'item_image_file' in request.FILES:
+#                 try:
+#                     item = Item.objects.get(id=item_id)
+#                     ItemImage.objects.create(item=item, image=request.FILES['item_image_file'])
+#                 except Item.DoesNotExist:
+#                     pass
+#         return redirect('profile')
+#
+#     context = {'profile': profile}
+#     if profile.is_librarian:
+#         return render(request, 'librarian_image_upload.html', context)
+#     else:
+#         return render(request, 'patron_image_upload.html', context)
+# @login_required
+# def profile_text_view(request):
+#     profile = request.user.profile
+#     if request.method == 'POST':
+#         form = ProfileTextForm(request.POST, request.FILES, instance=profile, user=request.user)
+#         if form.is_valid():
+#             form.save()
+#             messages.success(request, "Profile updated successfully!")
+#             return redirect('profile')
+#     else:
+#         form = ProfileTextForm(instance=profile, user=request.user)
+#
+#     borrowed = BorrowRequest.objects.filter(user=request.user, approved=True).order_by('-due_date')
+#
+#     lent = None
+#     if profile.is_librarian:
+#         lent = Item.objects.all().order_by('-id')  # Optional: filter by ownership if relevant
+#
+#     template = 'librarian_profile.html' if profile.is_librarian else 'patron_profile.html'
+#
+#     return render(request, template, {
+#         'form': form,
+#         'profile': profile,
+#         'borrowed': borrowed,
+#         'lent': lent,
+#     })
 @login_required
 def profile_view(request):
+    profile = request.user.profile
+
+    picture_form = ProfileImageForm(request.POST or None, request.FILES or None, instance=profile)
+    text_form = ProfileTextForm(request.POST or None, instance=profile, user=request.user)
+
     if request.method == 'POST':
         if 'clear_picture' in request.POST:
-            # Clear the profile picture
-            request.user.profile.profile_picture = None
-            request.user.profile.save()
+            profile.profile_picture = None
+            profile.save()
             messages.success(request, 'Profile picture cleared successfully!')
             return redirect('profile')
-            
-        form = ProfileImageForm(request.POST, request.FILES, instance=request.user.profile)
-        if form.is_valid():
-            form.save()
+
+        if 'update_picture' in request.POST and picture_form.is_valid():
+            picture_form.save()
             messages.success(request, 'Profile picture updated successfully!')
             return redirect('profile')
-    else:
-        form = ProfileImageForm(instance=request.user.profile)
-    
-    return render(request, 'profile.html', {'form': form})
 
-@login_required
-def image_upload_view(request):
-    profile = request.user.profile
-    if request.method == 'POST':
-        if 'profile_image_file' in request.FILES:
-            profile.profile_picture = request.FILES['profile_image_file']
-            profile.save()
-        
-        # Librarians (ONLY) can also add an image to an item
-        if profile.is_librarian and request.POST.get('item_id'):
-            item_id = request.POST.get('item_id')
-            if 'item_image_file' in request.FILES:
-                try:
-                    item = Item.objects.get(id=item_id)
-                    ItemImage.objects.create(item=item, image=request.FILES['item_image_file'])
-                except Item.DoesNotExist:
-                    pass
-        return redirect('profile')
-    
-    context = {'profile': profile}
-    if profile.is_librarian:
-        return render(request, 'librarian_image_upload.html', context)
-    else:
-        return render(request, 'patron_image_upload.html', context)
+        if 'update_text' in request.POST and text_form.is_valid():
+            text_form.save()
+            messages.success(request, 'Profile info updated successfully!')
+            return redirect('profile')
 
+    borrowed = BorrowRequest.objects.filter(user=request.user, approved=True).order_by('-due_date')
+    lent = Item.objects.all().order_by('-id') if profile.is_librarian else None
+
+    liked_items = Item.objects.filter(votes__user=request.user, votes__vote=1)
+    disliked_items = Item.objects.filter(votes__user=request.user, votes__vote=-1)
+
+    return render(request, 'profile.html', {
+        'form': picture_form,
+        'text_form': text_form,
+        'profile': profile,
+        'borrowed': borrowed,
+        'lent': lent,
+        'liked_items': liked_items,
+        'disliked_items': disliked_items,
+    })
 @login_required
 def borrow_item(request, item_id):
     item = get_object_or_404(Item, id=item_id)
@@ -152,7 +216,7 @@ def create_item(request):
         # Get the default library (assuming single library system)
         library = Library.objects.first()
         if not library:
-            library = Library.objects.create(name="Main Library")
+            library= Library.objects.create(name="Main Library")
 
         # Create the item
         item = Item.objects.create(
@@ -317,7 +381,7 @@ def edit_collection(request, collection_id):
         if request.user.profile.is_librarian:
             collection.is_public = request.POST.get('is_public') == 'on'
         else:
-            collection.is_public = True 
+            collection.is_public = True
         collection.save()
         
         # Update items
