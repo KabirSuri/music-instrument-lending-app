@@ -37,9 +37,12 @@ urlpatterns = [
     path('borrow/<int:item_id>/', views.borrow_item, name="borrow_item"),
     path('items/', views.search_items, name="search_items"),
     path('items/<int:item_id>/', views.item_detail, name="item_detail"),
+    path('borrow/<int:item_id>/', views.borrow_item, name="borrow_item"),
+    path('manage-borrow-request/<int:request_id>/', views.manage_borrow_request, name='manage_borrow_request'),
     path('create-item/', views.create_item, name='create-item'),
     path('edit-item/<int:item_id>/', views.edit_item, name='edit-item'),
     path('delete-item/<int:item_id>/', views.delete_item, name='delete_item'),
+    path('items/<int:item_id>/rate/', views.rate_item, name='rate_item'),
     # Collection URLs
     path('collections/', views.collection_list, name='collections'),
     path('collections/create/', views.create_collection, name='create-collection'),

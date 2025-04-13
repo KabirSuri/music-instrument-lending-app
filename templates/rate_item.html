@@ -1,0 +1,8 @@
+<h1>Rate {{ item.name }}</h1>
+<p>Average Rating: {{ item.average_rating|floatformat:1 }} / 5</p>
+
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Submit Rating</button>
+</form>

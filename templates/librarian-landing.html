@@ -158,23 +158,27 @@
                 <div class="card-body">
                     {% if requests %}
                         <div class="list-group list-group-flush">
-                        {% for request in requests %}
-                            <div class="list-group-item">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <div>
-                                        <h6 class="mb-1">{{ request.item.title }}</h6>
-                                        <small class="text-muted">
-                                            Requested by: {{ request.user.email }}<br>
-                                            Date: {{ request.requested_at|date:"F j, Y" }}
-                                        </small>
-                                    </div>
-                                    <div>
-                                        <button class="btn btn-sm btn-success">Approve</button>
-                                        <button class="btn btn-sm btn-danger">Deny</button>
+                            {% for request in requests %}
+                                <div class="list-group-item">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <h6 class="mb-1">{{ request.item.title }}</h6>
+                                            <small class="text-muted">
+                                                Requested by: {{ request.user.email }}<br>
+                                                Date: {{ request.requested_at|date:"F j, Y" }}
+                                            </small>
+                                        </div>
+                                        <div>
+                                            <form method="post" action="{% url 'manage_borrow_request' request.id %}" style="display:inline;">
+                                                {% csrf_token %}
+                                                <input type="hidden" name="borrow_request_id" value="{{ request.id }}">
+                                                <button type="submit" name="action" value="approve" class="btn btn-sm btn-success">Approve</button>
+                                                <button type="submit" name="action" value="deny" class="btn btn-sm btn-danger">Deny</button>
+                                            </form>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                        {% endfor %}
+                            {% endfor %}
                         </div>
                     {% else %}
                         <div class="empty-state">

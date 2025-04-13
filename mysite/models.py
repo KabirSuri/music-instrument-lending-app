@@ -73,7 +73,6 @@ def update_role_on_login(request, user, **kwargs):
     print(f"update_role_on_login signal triggered for user: {user.email}")
     update_user_role(user, request)
 
-# Maybe unneeded, unclear if we will ever have >1 library https://s25.cs3240.org/project.html#libraries
 class Library(models.Model):
     name = models.CharField(max_length=255)
     description = models.TextField(blank=True, null=True)
@@ -81,9 +80,7 @@ class Library(models.Model):
     def __str__(self):
         return self.name
 
-# https://s25.cs3240.org/project.html#items
 class Item(models.Model):
-    # Defaults from project info examples; replaceable if unneeded
     STATUS_CHOICES = [
         ('checked_in', 'Checked In'),
         ('in_circulation', 'In Circulation'),
@@ -95,13 +92,18 @@ class Item(models.Model):
     status = models.CharField(max_length=50, choices=STATUS_CHOICES)
     library = models.ForeignKey(Library, on_delete=models.CASCADE, related_name='items')
     description = models.TextField(blank=True, null=True)
-    # Items belong to 0-inf collections inclusive
     collections = models.ManyToManyField('Collection', related_name='items', blank=True)
     
+    def average_rating(self):
+        """Calculate the average rating for the item."""
+        reviews = self.reviews.all()
+        if reviews.exists():
+            return sum(review.stars for review in reviews) / reviews.count()
+        return 0
+
     def __str__(self):
         return self.title
 
-# Item images, fetched from S3
 class ItemImage(models.Model):
     item = models.ForeignKey(Item, on_delete=models.CASCADE, related_name='images')
     image = models.ImageField(upload_to='item_images/', null=True, blank=True)
@@ -110,17 +112,19 @@ class ItemImage(models.Model):
     def __str__(self):
         return f"Image for {self.item.title}"
 
-# Item ratings/comments
-class ItemReview(models.Model):
+class Rating(models.Model):
     item = models.ForeignKey(Item, on_delete=models.CASCADE, related_name='reviews')
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    rating = models.PositiveSmallIntegerField()
+    stars = models.PositiveSmallIntegerField()  # Rating out of 5
     comment = models.TextField(blank=True, null=True)
     time = models.DateTimeField(auto_now_add=True)
-    
+
+    class Meta:
+        unique_together = ('item', 'user')  # Prevent duplicate reviews by the same user
+
     def __str__(self):
         return f"Review for {self.item.title} by {self.user.email}"
-    
+
 class BorrowRequest(models.Model):
     item = models.ForeignKey(Item, on_delete=models.CASCADE, related_name='borrow_requests')
     user = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -139,8 +143,6 @@ class BorrowRequest(models.Model):
     def __str__(self):
         return f"{self.user.username} requested {self.item.title}"
 
-
-# https://s25.cs3240.org/project.html#collections
 class Collection(models.Model):
     title = models.CharField(max_length=255)
     description = models.TextField(blank=True, null=True)
@@ -149,14 +151,13 @@ class Collection(models.Model):
         on_delete=models.CASCADE,
         default=1,
         related_name='collections_created'
-        )
+    )
     is_public = models.BooleanField(default=True)
     library = models.ForeignKey(
         Library, 
         on_delete=models.CASCADE, 
         related_name='collections'
     )
-    # Users who can access a PRIVATE collection (librarians bypass this automatically
     allowed_users = models.ManyToManyField(
         User, 
         blank=True,
