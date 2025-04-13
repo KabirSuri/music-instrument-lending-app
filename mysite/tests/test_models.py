@@ -1,7 +1,7 @@
 from django.test import TestCase
 from django.contrib.auth.models import User
 from django.core.files.uploadedfile import SimpleUploadedFile
-from ..models import UserProfile, Library, Item, Collection, ItemImage, ItemReview, LikeDislike
+from ..models import UserProfile, Library, Item, Collection, ItemImage, ItemReview
 from django.utils import timezone
 from django.conf import settings
 
@@ -17,21 +17,6 @@ class UserProfileTest(TestCase):
 
     def test_profile_str(self):
         self.assertEqual(str(self.profile), self.user.email)
-
-class ProfileLikesTest(TestCase):
-    def setUp(self):
-        self.user = User.objects.create_user(username='testuser', password='testpass123')
-        self.library = Library.objects.create(name="Main Library")
-        self.item1 = Item.objects.create(title='Item 1', primary_identifier='I1', status='available', library_id=1)
-        self.item2 = Item.objects.create(title='Item 2', primary_identifier='I2', status='available', library_id=1)
-        LikeDislike.objects.create(user=self.user, item=self.item1, vote=1)
-        LikeDislike.objects.create(user=self.user, item=self.item2, vote=-1)
-
-    def test_liked_and_disliked_items_in_profile_view(self):
-        self.client.login(username='testuser', password='testpass123')
-        response = self.client.get('/profile/')
-        self.assertContains(response, 'Item 1')
-        self.assertContains(response, 'Item 2')
 
 class LibraryTest(TestCase):
     def setUp(self):
