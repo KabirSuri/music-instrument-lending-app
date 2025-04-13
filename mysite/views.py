@@ -393,7 +393,9 @@ def rate_item(request, item_id):
             rating, created = Rating.objects.update_or_create(
                 item=item,
                 user=request.user,
-                defaults={'stars': form.cleaned_data['stars']}
+                defaults={'stars': form.cleaned_data['stars'],
+                          'comment': form.cleaned_data['comment']
+                          }
             )
             return redirect('item_detail', item_id=item.id)
     else:

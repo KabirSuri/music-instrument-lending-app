@@ -32,7 +32,7 @@ class ProfileImageForm(forms.ModelForm):
 class RatingForm(forms.ModelForm):
     class Meta:
         model = Rating
-        fields = ['stars']
+        fields = ['stars', 'comment']
         widgets = {
             'stars': forms.NumberInput(attrs={'min': 1, 'max': 5, 'step': 1}),
         }
