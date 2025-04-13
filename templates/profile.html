@@ -1,6 +1,5 @@
 {% extends "base.html" %}
 {% load static %}
-{% load widget_tweaks %}
 
 {% block extra_css %}
 <style>
@@ -10,7 +9,7 @@
         padding: 20px;
         box-shadow: 0 0 15px rgba(35, 45, 75, 0.1);
     }
-
+    
     .profile-picture-container {
         position: relative;
         width: 200px;
@@ -21,19 +20,19 @@
         border: 4px solid var(--uva-orange);
         box-shadow: 0 0 10px rgba(229, 114, 0, 0.3);
     }
-
+    
     .profile-picture {
         width: 100%;
         height: 100%;
         object-fit: cover;
     }
-
+    
     .upload-btn-wrapper {
         position: relative;
         overflow: hidden;
         display: inline-block;
     }
-
+    
     .upload-btn {
         border: 2px solid var(--uva-blue);
         color: var(--uva-blue);
@@ -43,13 +42,13 @@
         font-weight: bold;
         transition: all 0.3s ease;
     }
-
+    
     .upload-btn:hover {
         background-color: var(--uva-orange);
         border-color: var(--uva-orange);
         color: white;
     }
-
+    
     .upload-btn-wrapper input[type=file] {
         font-size: 100px;
         position: absolute;
@@ -58,15 +57,10 @@
         opacity: 0;
         cursor: pointer;
     }
-
+    
     .alert {
         border-radius: 8px;
         border-left: 4px solid var(--uva-orange);
-    }
-
-    .form-control[readonly] {
-        background-color: #e9ecef;
-        cursor: not-allowed;
     }
 </style>
 {% endblock %}
@@ -88,16 +82,16 @@
                                 </div>
                             {% endfor %}
                         {% endif %}
-
+                        
                         <div class="text-center mb-4">
                             <div class="profile-picture-container">
                                 {% if form.instance.profile_picture %}
-                                    <img src="{{ form.instance.profile_picture.url }}"
-                                         alt="Profile Picture"
+                                    <img src="{{ form.instance.profile_picture.url }}" 
+                                         alt="Profile Picture" 
                                          class="profile-picture">
                                 {% else %}
-                                    <img src="{% static 'images/default-profile.png' %}"
-                                         alt="Default Profile Picture"
+                                    <img src="{% static 'images/default-profile.png' %}" 
+                                         alt="Default Profile Picture" 
                                          class="profile-picture">
                                 {% endif %}
                             </div>
@@ -110,89 +104,13 @@
                                     <button class="upload-btn">Choose New Picture</button>
                                     {{ form.profile_picture }}
                                 </div>
-                                <button type="submit" name="update_picture" class="btn btn-primary mt-3">Update Profile Picture</button>
+                                <button type="submit" class="btn btn-primary mt-3">Update Profile Picture</button>
                             </div>
                         </form>
-
-                        <hr>
-
-                        <h4 class="text-center mb-3">Edit Your Info</h4>
-
-                        <form method="post">
-                            {% csrf_token %}
-                            <div class="mb-3">
-                                <label for="id_first_name" class="form-label">First Name</label>
-                                {{ text_form.first_name|add_class:"form-control editable-input" }}
-                            </div>
-
-                            <div class="mb-3">
-                                <label for="id_last_name" class="form-label">Last Name</label>
-                                {{ text_form.last_name|add_class:"form-control editable-input" }}
-                            </div>
-
-                            <div class="mb-3">
-                                <label for="id_email" class="form-label">Email</label>
-                                {{ text_form.email|add_class:"form-control editable-input" }}
-                            </div>
-
-                            <div class="mb-3">
-                                <label for="id_bio" class="form-label">Bio</label>
-                                {{ text_form.bio|add_class:"form-control editable-input" }}
-                            </div>
-
-                            <div class="text-center">
-                                <button type="button" id="edit-btn" class="btn btn-warning" onclick="enableEditing()">Edit</button>
-                                <button type="submit" name="update_text" id="submit-btn" class="btn btn-success d-none">Submit</button>
-                            </div>
-                        </form>
-                        <hr>
-                        <h4 class="text-center mb-3">Liked Items ❤️</h4>
-                        <ul class="list-group mb-4">
-                            {% for item in liked_items %}
-                                <li class="list-group-item d-flex justify-content-between align-items-center">
-                                    <a href="{% url 'item_detail' item.id %}">{{ item.title }}</a>
-                                    <span class="badge bg-success">👍</span>
-                                </li>
-                            {% empty %}
-                                <li class="list-group-item text-muted">You haven't liked any items yet.</li>
-                            {% endfor %}
-                        </ul>
-
-                        <h4 class="text-center mb-3">Disliked Items 💔</h4>
-                        <ul class="list-group mb-4">
-                            {% for item in disliked_items %}
-                                <li class="list-group-item d-flex justify-content-between align-items-center">
-                                    <a href="{% url 'item_detail' item.id %}">{{ item.title }}</a>
-                                    <span class="badge bg-danger">👎</span>
-                                </li>
-                            {% empty %}
-                                <li class="list-group-item text-muted">You haven't disliked any items yet.</li>
-                            {% endfor %}
-                        </ul>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
-{% endblock %}
-
-{% block extra_js %}
-<script>
-    function enableEditing() {
-        const inputs = document.querySelectorAll('.editable-input');
-        inputs.forEach(input => input.removeAttribute('readonly'));
-        document.getElementById('edit-btn').classList.add('d-none');
-        document.getElementById('submit-btn').classList.remove('d-none');
-    }
-
-    function disableEditing() {
-        const inputs = document.querySelectorAll('.editable-input');
-        inputs.forEach(input => input.setAttribute('readonly', true));
-        document.getElementById('edit-btn').classList.remove('d-none');
-        document.getElementById('submit-btn').classList.add('d-none');
-    }
-
-    document.addEventListener('DOMContentLoaded', disableEditing);
-</script>
-{% endblock %}
+{% endblock %} 
