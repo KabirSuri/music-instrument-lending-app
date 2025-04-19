@@ -55,8 +55,8 @@ def librarian_login(request):
         request.user.profile.save()
         messages.success(request, "Your account has been updated to librarian status.")
 
-    # Get pending borrow requests
-    requests = BorrowRequest.objects.filter(approved=False).order_by('-requested_at')
+    # Get pending borrow requests for items not yet "in circulation"
+    requests = BorrowRequest.objects.filter(approved=False, item__status='checked_in').order_by('-requested_at')
     
     collections = Collection.objects.all().order_by('-id')[:5]  # Get 5 most recent collections
     
@@ -116,15 +116,40 @@ def image_upload_view(request):
 def borrow_item(request, item_id):
     item = get_object_or_404(Item, id=item_id)
 
-    # Prevent duplicate requests
-    existing_request = BorrowRequest.objects.filter(item=item, user=request.user, approved=False).exists()
-    if existing_request:
-        return redirect('item_detail', item_id=item.id)
+    borrow_request = BorrowRequest.objects.filter(item=item, user=request.user, approved=False).first()
 
-    # Create a borrow request
-    BorrowRequest.objects.create(item=item, user=request.user)
+    if borrow_request: #the item already has been requested, now cancel
+        borrow_request.delete()
+        messages.success(request, f"Your borrow request for '{item.title}' has been canceled.")
+    else: #request the item
+        BorrowRequest.objects.create(item=item, user=request.user)
+        messages.success(request, f"Your borrow request for '{item.title}' has been submitted.")
 
-    return redirect('item_detail', item_id=item.id)  # Redirect back to item page
+    return redirect('item_detail', item_id=item.id)  # Redirect back to the item detail page
+
+def manage_borrow_request(request, request_id):
+    borrow_request = get_object_or_404(BorrowRequest, id=request_id)
+    item = borrow_request.item
+
+    # Only allow librarians to approve/deny requests
+    if not request.user.profile.is_librarian:
+        messages.error(request, "You do not have permission to manage borrow requests.")
+        return redirect('librarian-landing')
+
+    if request.method == 'POST':
+        action = request.POST.get('action')
+
+        if action == 'approve':
+            # Approve the request and update the item status to "in circulation"
+            borrow_request.approve()
+            messages.success(request, f"Request for '{item.title}' has been approved and item is now in circulation.")
+        
+        elif action == 'deny':
+            # Deny the borrow request (delete it)
+            borrow_request.delete()
+            messages.success(request, f"Request for '{item.title}' has been denied.")
+    
+    return redirect('librarian-landing')
 
 def search_items(request):
     """Display and search for items."""
@@ -138,9 +163,15 @@ def search_items(request):
     return render(request, "item_list.html", {"items": items, "query": query})
 
 
+@login_required
 def item_detail(request, item_id):
     item = get_object_or_404(Item, id=item_id)
-    return render(request, "item_detail.html", {"item": item})
+    has_requested = BorrowRequest.objects.filter(item=item, user=request.user, approved=False).exists()
+
+    return render(request, 'item_detail.html', {
+        'item': item,
+        'has_requested': has_requested,
+    })
 
 @login_required
 def create_item(request):
@@ -242,7 +273,6 @@ def collection_list(request):
                 Q(description__icontains=query)
             )
     else:
-        # Patrons see only public collections.
         collections = Collection.objects.filter(is_public=True).order_by('-id')
         if query:
             collections = collections.filter(
