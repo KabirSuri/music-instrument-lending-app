@@ -1,0 +1,68 @@
+{% load i18n %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{% trans "Sign In Via Google" %}</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #232D4B; /* UVA Blue */
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+        }
+
+        .confirmation-container {
+            background-color: white;
+            padding: 2rem 3rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+            max-width: 400px;
+            width: 100%;
+            text-align: center;
+            border: 2px solid #E57200; /* UVA Orange */
+        }
+
+        h1 {
+            color: #232D4B;
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        p {
+            margin-bottom: 2rem;
+            font-size: 1rem;
+            color: #333;
+        }
+
+        button {
+            background-color: #E57200;
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            font-size: 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+
+        button:hover {
+            background-color: #C66100;
+        }
+    </style>
+</head>
+<body>
+    <div class="confirmation-container">
+        <h1>{% trans "Sign In Via Google" %}</h1>
+        <p>{% trans "You are about to sign in using a third-party account from Google." %}</p>
+        <form method="post" action="">
+            {% csrf_token %}
+            <button type="submit">{% trans "Continue" %}</button>
+        </form>
+    </div>
+</body>
+</html>
