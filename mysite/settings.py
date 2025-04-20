@@ -25,7 +25,7 @@ LOGIN_URL = '/login/'
 SECRET_KEY = 'django-insecure-+ks8lupg3*r1g6x*z480jn+w)(uxetnbg1&2(5)vz8@1$14zot'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 IS_HEROKU_APP = "DYNO" in os.environ and "CI" not in os.environ
 if IS_HEROKU_APP:
     ALLOWED_HOSTS = ["*"]
