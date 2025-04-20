@@ -167,17 +167,17 @@ class Collection(models.Model):
     def __str__(self):
         return self.title
 
-class LikeDislike(models.Model):
-    LIKE = 1
-    DISLIKE = -1
-    VOTE_CHOICES = (
-        (LIKE, 'Like'),
-        (DISLIKE, 'Dislike'),
-    )
-
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    item = models.ForeignKey(Item, on_delete=models.CASCADE, related_name='votes')
-    vote = models.SmallIntegerField(choices=VOTE_CHOICES)
-
-    class Meta:
-        unique_together = ('user', 'item')
+# class LikeDislike(models.Model):
+#     LIKE = 1
+#     DISLIKE = -1
+#     VOTE_CHOICES = (
+#         (LIKE, 'Like'),
+#         (DISLIKE, 'Dislike'),
+#     )
+#
+#     user = models.ForeignKey(User, on_delete=models.CASCADE)
+#     item = models.ForeignKey(Item, on_delete=models.CASCADE, related_name='votes')
+#     vote = models.SmallIntegerField(choices=VOTE_CHOICES)
+#
+#     class Meta:
+#         unique_together = ('user', 'item')

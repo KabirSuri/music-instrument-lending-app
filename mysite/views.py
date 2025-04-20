@@ -2,7 +2,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.db.models import Q
-from .models import Item, BorrowRequest, ItemImage, Library, UserProfile, Collection, LikeDislike,Rating
+from .models import Item, BorrowRequest, ItemImage, Library, UserProfile, Collection,Rating
 from .forms import ItemForm, ProfileImageForm, ProfileTextForm
 from django.urls import reverse
 from django.contrib.auth.views import LogoutView
@@ -163,9 +163,9 @@ def profile_view(request):
 
     borrowed = BorrowRequest.objects.filter(user=request.user, approved=True).order_by('-due_date')
     lent = Item.objects.all().order_by('-id') if profile.is_librarian else None
-
-    liked_items = Item.objects.filter(votes__user=request.user, votes__vote=1)
-    disliked_items = Item.objects.filter(votes__user=request.user, votes__vote=-1)
+    #
+    # liked_items = Item.objects.filter(votes__user=request.user, votes__vote=1)
+    # disliked_items = Item.objects.filter(votes__user=request.user, votes__vote=-1)
 
     return render(request, 'profile.html', {
         'form': picture_form,
@@ -173,8 +173,8 @@ def profile_view(request):
         'profile': profile,
         'borrowed': borrowed,
         'lent': lent,
-        'liked_items': liked_items,
-        'disliked_items': disliked_items,
+        # 'liked_items': liked_items,
+        # 'disliked_items': disliked_items,
     })
 @login_required
 def borrow_item(request, item_id):
