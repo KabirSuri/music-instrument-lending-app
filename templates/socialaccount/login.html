@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block content %}
+<div class="login-container" style="max-width: 400px;
+margin: 4rem auto; background-color: white; padding: 2.5rem;
+border-radius: 10px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+border: 2px solid #E57200;
+font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;">
+    <div class="uva-brand" style="text-align: center; margin-bottom: 1rem; font-size: 1.2rem; font-weight: 500; color: #232D4B;">
+        University of Virginia
+    </div>
+    <div class="login-header" style="text-align: center; color: #232D4B; font-size: 1.75rem; font-weight: 600; margin-bottom: 1rem;">
+        {% trans "Sign In via Google" %}
+    </div>
+
+    {% if provider %}
+        <div class="login-message" style="text-align: center; font-size: 1rem; margin-bottom: 2rem; color: #333;">
+            {% blocktrans with provider.name as provider %}
+                You are about to sign in using a third-party account from {{ provider }}.
+            {% endblocktrans %}
+        </div>
+    {% else %}
+        <div class="login-message" style="text-align: center; font-size: 1rem; margin-bottom: 2rem; color: #333;">
+            You are about to sign in using a third-party account.
+        </div>
+    {% endif %}
+
+    <form method="post" action="">
+        {% csrf_token %}
+        {% if form %}
+            {{ form.as_p }}
+        {% endif %}
+        <button type="submit" style="display: block; width: 100%; padding: 0.75rem; font-size: 1.1rem; font-weight: 500; text-align: center; background-color: #E57200; color: white; border: none; border-radius: 6px; transition: background-color 0.2s ease;">
+            {% trans "Continue" %}
+        </button>
+    </form>
+</div>
+{% endblock %}
