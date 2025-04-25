@@ -2,8 +2,8 @@
 
 This project was created for the University of Virginia's CS 3240 course.
 
-Scrum Master - Cole Popielec
-Software Architect - Jacob Templeton
-DevOps Manager - Aaryan Asthana
-Testing Manager - Tijun Fu
-Requirements Manager - Kabir Suri
+Scrum Master - Cole Popielec <br/>
+Software Architect - Jacob Templeton <br/>
+DevOps Manager - Aaryan Asthana <br/>
+Testing Manager - Tijun Fu <br/>
+Requirements Manager - Kabir Suri <br/>
