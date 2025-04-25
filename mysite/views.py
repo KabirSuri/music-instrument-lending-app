@@ -3,7 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.db.models import Q
 from .models import Item, BorrowRequest, ItemImage, Library, UserProfile, Collection,Rating
-from .forms import ItemForm, ProfileImageForm, ProfileTextForm
+from .forms import ItemForm, ProfileImageForm, ProfileTextForm, RatingForm
 from django.urls import reverse
 from django.contrib.auth.views import LogoutView
 from allauth.socialaccount.providers.google.views import oauth2_login

@@ -53,10 +53,12 @@ class ProfileTextForm(forms.ModelForm):
             self.user.save()
             profile.save()
         return profile
+    
 class RatingForm(forms.ModelForm):
     class Meta:
         model = Rating
         fields = ['stars', 'comment']
         widgets = {
             'stars': forms.NumberInput(attrs={'min': 1, 'max': 5, 'step': 1}),
+            'comment': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
         }
