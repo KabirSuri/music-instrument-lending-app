@@ -9,7 +9,6 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
-    
     services:
       postgres:
         image: postgres:13
@@ -24,11 +23,10 @@ jobs:
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
-
     env:
       DATABASE_URL: postgres://postgres:postgres@localhost:5432/postgres
-      SECRET_API_KEY: ${{ secrets.SECRET_API_KEY }}
-
+      AWS_ACCESS_KEY: ${{ secrets.AWS_ACCESS_KEY }}
+      AWS_SECRET_KEY: ${{ secrets.AWS_SECRET_KEY }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -43,23 +41,18 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Wait for Postgres to be ready
+      - name: Wait for Postgres
         run: |
-          for i in {1..10}; do
-            pg_isready -h localhost -p 5432 -U postgres && break
+          until pg_isready -h localhost -U postgres; do
             echo "Waiting for Postgres..."
-            sleep 3
+            sleep 1
           done
 
       - name: Run migrations
-        env:
-          DATABASE_URL: ${{ env.DATABASE_URL }}
-          SECRET_API_KEY: ${{ env.SECRET_API_KEY }}
-        run: python manage.py migrate
+        run: |
+          python manage.py migrate
 
       - name: Run tests
-        env:
-          DATABASE_URL: ${{ env.DATABASE_URL }}
-          SECRET_API_KEY: ${{ env.SECRET_API_KEY }}
-        run: python manage.py test
+        run: |
+          python manage.py test
 
